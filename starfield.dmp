@@ -1,0 +1,447 @@
+00001  0000             ; 10 SYS (2096)
+00002  0001             
+00003  0001             GENERATETO STARFIELD.PRG
+00004  0001             DEBUGSTARTADDRESS START
+00005  0001             
+00006  0001             VIC_COLOR  = $D800
+00007  0001             
+00008  0001             ; COLORS
+00009  0001             VIC_BLACK  = $00
+00010  0001             VIC_WHITE  = $01
+00011  0001             VIC_RED    = $02
+00012  0001             VIC_CYAN   = $03
+00013  0001             VIC_VIOLET = $04
+00014  0001             VIC_GREEN  = $05
+00015  0001             VIC_BLUE   = $06
+00016  0001             VIC_YELLOW = $07
+00017  0001             VIC_ORANGE = $08
+00018  0001             VIC_BROWN  = $09
+00019  0001             VIC_LIGHTRED = $0A
+00020  0001             VIC_DARKGREY = $0B
+00021  0001             VIC_GREY   = $0C
+00022  0001             VIC_LIGHTGREEN = $0D
+00023  0001             VIC_LIGHTBLUE = $0E
+00024  0001             VIC_LIGHTGRAY = $0F
+00025  0001             
+00026  0001             ; REGISTERS
+00027  0001             
+00028  0001             ; SPRITES
+00029  0001             VIC_SP0_X  = $D000
+00030  0001             VIC_SP0_Y  = $D001
+00031  0001             VIC_SP1_X  = $D002
+00032  0001             VIC_SP1_Y  = $D003
+00033  0001             VIC_SP2_X  = $D004
+00034  0001             VIC_SP2_Y  = $D005
+00035  0001             VIC_SP3_X  = $D006
+00036  0001             VIC_SP3_Y  = $D007
+00037  0001             VIC_SP4_X  = $D008
+00038  0001             VIC_SP4_Y  = $D009
+00039  0001             VIC_SP5_X  = $D00A
+00040  0001             VIC_SP5_Y  = $D00B
+00041  0001             VIC_SP6_X  = $D00C
+00042  0001             VIC_SP6_Y  = $D00D
+00043  0001             VIC_SP7_X  = $D00E
+00044  0001             VIC_SP7_Y  = $D00F
+00045  0001             VIC_SPX    = $D010
+00046  0001             
+00047  0001             ; COLORS
+00048  0001             VIC_BORDERC = $D020
+00049  0001             VIC_BG0C   = $D021
+00050  0001             VIC_BG1C   = $D022
+00051  0001             VIC_BG2C   = $D023
+00052  0001             VIC_BG3C   = $D024
+00053  0001             VIC_SP0MC  = $D025
+00054  0001             VIC_SP1MC  = $D026
+00055  0001             VIC_SP0C   = $D027
+00056  0001             VIC_SP1C   = $D028
+00057  0001             VIC_SP2C   = $D029
+00058  0001             VIC_SP3C   = $D02A
+00059  0001             VIC_SP4C   = $D02B
+00060  0001             VIC_SP5C   = $D02C
+00061  0001             VIC_SP6C   = $D02D
+00062  0001             VIC_SP7C   = $D02E
+00063  0001             
+00064  0001             
+00065  0001             ; CONTROL
+00066  0001             VIC_MEM    = $D018
+00067  0001             VIC_RASTER = $D012
+00068  0001             
+00069  0001             
+00070  0001             DEFM       ADDAW
+00071  0001                        CLC
+00072  0001                        LDA /2
+00073  0001                        ADC #</1
+00074  0001                        STA /2
+00075  0001                        LDA /2+1
+00076  0001                        ADC #>/1
+00077  0001                        STA /2+1
+00078  0001                        
+00079  0001                        ENDM
+00080  0001             
+00081  0001             
+00082  0001             DEFM       MOVEW
+00083  0001                        LDA #</1
+00084  0001                        STA /2
+00085  0001                        LDA #>/1
+00086  0001                        STA /2+1
+00087  0001                        ENDM
+00088  0001             
+00089  0001                        
+00090  0001             
+00091  0001             *=$0801
+00092  0801             
+00093  0801  0E 08 0A              BYTE    $0E, $08, $0A, $00, $9E, $20, $28,  $32, $30, $39, $36, $29, $00, $00, $00
+00094  0810             
+00095  0810             *=$830
+00096  0830             
+00097  0830             SCREEN     = $0400
+00098  0830             CHARS      = $3000
+00099  0830             CHARSETEND = $3FFF
+00100  0830             
+00101  0830             ; *********************
+00102  0830             ; ZERO PAGE VARIABLES
+00103  0830             ; *********************
+00104  0830             
+00105  0830             SCRPTR     = $10    ; FOR CHARACTER FILLING
+00106  0830             ATEMP      = $12    ; STORE A SOMETIMES
+00107  0830             FRAMECT    = $13
+00108  0830             CURCOLOR   = $14   ; WORD
+00109  0830             
+00110  0830                        
+00111  0830             START
+00112  0830             
+00113  0830                        ; DISABLE CIA INTERRUPT (IS THIS ON BY DEFAULT FOR BASIC?)
+00114  0830                        ; THIS IS IMPORTANT OR THE COPY CHAR ROUTINE WILL CRASH FOR SOME REASON
+00115  0830  AD 0E DC              LDA $DC0E
+00116  0833  29 FE                 AND #$FE
+00117  0835  8D 0E DC              STA $DC0E
+00118  0838             
+00119  0838                        ; ************
+00120  0838                        ; SETUP COLORS
+00121  0838                        ; ************
+00122  0838  A9 00                 LDA     #$0
+00123  083A  8D 20 D0              STA     $D020   ; BORDER
+00124  083D  8D 21 D0              STA     $D021   ; BACKGROUND
+00125  0840             
+00126  0840             
+00127  0840  A9 00                 LDA     #<VIC_COLOR
+00128  0842  85 14                 STA     CURCOLOR
+00129  0844  A9 D8                 LDA     #>VIC_COLOR
+00130  0846  85 15                 STA     CURCOLOR+1
+00131  0848             
+00132  0848  A9 06                 LDA     #VIC_BLUE
+00133  084A  20 34 09              JSR     TRIBAND
+00134  084D  A9 0E                 LDA     #VIC_LIGHTBLUE
+00135  084F  20 34 09              JSR     TRIBAND
+00136  0852  A9 07                 LDA     #VIC_YELLOW
+00137  0854  20 34 09              JSR     TRIBAND
+00138  0857  A9 01                 LDA     #VIC_WHITE
+00139  0859  20 34 09              JSR     TRIBAND
+00140  085C  A9 01                 LDA     #VIC_WHITE
+00141  085E  20 34 09              JSR     TRIBAND
+00142  0861  A9 07                 LDA     #VIC_YELLOW
+00143  0863  20 34 09              JSR     TRIBAND
+00144  0866  A9 0A                 LDA     #VIC_LIGHTRED
+00145  0868  20 34 09              JSR     TRIBAND
+00146  086B  A9 02                 LDA     #VIC_RED
+00147  086D  20 34 09              JSR     TRIBAND
+00148  0870                        
+00149  0870  A5 01                 LDA $1
+00150  0872  29 FB                 AND #$FB
+00151  0874  85 01                 STA $1   ; CHAR ROM VISIBLE AT $D000
+00152  0876             
+00153  0876             
+00154  0876                        ; **********
+00155  0876                        ; COPY CHARS
+00156  0876                        ; **********
+00157  0876             
+00158  0876                        ; HTTPS://WWW.PAGETABLE.COM/C64REF/C64DISASM/
+00159  0876  A9 00                 LDA #$0
+00160  0878  A0 D0                 LDY #$D0
+00161  087A  85 5F                 STA 95
+00162  087C  84 60                 STY 96
+00163  087E  A9 FF                 LDA #$FF
+00164  0880  A0 DF                 LDY #$DF
+00165  0882  85 5A                 STA 90
+00166  0884  84 5B                 STY 91
+00167  0886  A9 FF                 LDA #<CHARSETEND         ; MUST KEEP THESE VALUES IN A AND Y
+00168  0888  A0 3F                 LDY #>CHARSETEND
+00169  088A  85 58                 STA 88
+00170  088C  84 59                 STY 89
+00171  088E  20 BF A3              JSR $A3BF       ; BLOCK COPY
+00172  0891             
+00173  0891  A5 01                 LDA $1
+00174  0893  09 04                 ORA #$04
+00175  0895  85 01                 STA $1         ; CHAR ROM VISIBILE OFF
+00176  0897             
+00177  0897                        
+00178  0897                        ; IDEALLY WE MOVE THE VIC COMPLETELY OUT OF THERE SO NO ROM CHARS
+00179  0897                        ; WITH THE CIA OUTPUTS AT $DD00
+00180  0897             
+00181  0897                        ; SELECT VIC CHARACTER BANK TO $3000
+00182  0897  AD 18 D0              LDA VIC_MEM     ; DEFAULT $15
+00183  089A  29 F0                 AND #$F0
+00184  089C  09 0C                 ORA #$0C
+00185  089E  8D 18 D0              STA VIC_MEM       ; $1C
+00186  08A1             
+00187  08A1             
+00188  08A1                        ; ********************
+00189  08A1                        ; PREP STAR CHARACTERS
+00190  08A1                        ; ********************
+00191  08A1             
+00192  08A1                        ; STARS ARE ON LINE 3
+00193  08A1                        ; AND ON LINE 7
+00194  08A1  A9 00                 LDA #$0
+00195  08A3  A2 0F                 LDX #15
+00196  08A5             @NULCHAR
+00197  08A5  9D 10 30              STA CHARS+16,X
+00198  08A8  CA                    DEX
+00199  08A9  10 FA                 BPL @NULCHAR
+00200  08AB             
+00201  08AB  A9 10                 LDA #$10
+00202  08AD  8D 13 30              STA CHARS+19    ; 16 + 3
+00203  08B0  A9 02                 LDA #$02
+00204  08B2  8D 1F 30              STA CHARS+31    ; 16 + 7
+00205  08B5             
+00206  08B5             
+00207  08B5                        ; ******************************************
+00208  08B5                        ; FILL SCREEN WITH ALTERNATING BC CHARACTERS
+00209  08B5                        ; ******************************************
+00210  08B5             
+00211  08B5             
+00212  08B5             
+00213  08B5  A9 00                 LDA #<SCREEN
+00214  08B7  85 10                 STA SCRPTR
+00215  08B9  A9 04                 LDA #>SCREEN
+00216  08BB  85 11                 STA SCRPTR+1
+00217  08BD  A2 18                 LDX #24                 ; 25 LINES
+00218  08BF  A9 02                 LDA #2                 ; B/C
+00219  08C1             @ROWLOOP
+00220  08C1  A0 27                 LDY #39
+00221  08C3             @LOOP      
+00222  08C3  91 10                 STA (SCRPTR),Y
+00223  08C5  49 01                 EOR #$1                 ; OTHER CHARACTER
+00224  08C7  88                    DEY
+00225  08C8  10 F9                 BPL @LOOP
+00226  08CA                        
+00227  08CA  49 01                 EOR #$1
+00228  08CC                        
+00229  08CC  85 12                 STA ATEMP
+00230  08CE             
+00231  08CE             
+00232  08CE  18                    CLC
+00233  08CF  A5 10                 LDA SCRPTR
+00234  08D1  69 28                 ADC #<40
+00235  08D3  85 10                 STA SCRPTR
+00236  08D5  A5 11                 LDA SCRPTR+1
+00237  08D7  69 00                 ADC #>40
+00238  08D9  85 11                 STA SCRPTR+1
+00239  08DB                        
+00240  08DB  A5 12                 LDA ATEMP
+00241  08DD                        
+00242  08DD  CA                    DEX
+00243  08DE  D0 E1                 BNE @ROWLOOP
+00244  08E0                        
+00245  08E0                        ; *********
+00246  08E0                        ; MAIN LOOP
+00247  08E0                        ; *********
+00248  08E0             
+00249  08E0  A9 00                 LDA     #$00
+00250  08E2  85 13                 STA     FRAMECT
+00251  08E4             FOREVER
+00252  08E4             
+00253  08E4  A9 40                 LDA     #$40
+00254  08E6             WAIT
+00255  08E6  CD 12 D0              CMP     VIC_RASTER
+00256  08E9  D0 FB                 BNE     WAIT
+00257  08EB             
+00258  08EB  A9 06                 LDA     #VIC_BLUE
+00259  08ED  8D 20 D0              STA     VIC_BORDERC
+00260  08F0             
+00261  08F0             
+00262  08F0                        ; SCROLL FAST STAR
+00263  08F0  18                    CLC
+00264  08F1  AD 13 30              LDA     CHARS+19 ;(16,3)
+00265  08F4  6A                    ROR
+00266  08F5  8D 13 30              STA     CHARS+19 ; (16,3)
+00267  08F8  AD 1B 30              LDA     CHARS+27 ; (24,3)
+00268  08FB  6A                    ROR
+00269  08FC  8D 1B 30              STA     CHARS+27 ;
+00270  08FF  90 08                 BCC     @NOL
+00271  0901  AD 13 30              LDA     CHARS+19
+00272  0904  09 80                 ORA     #$80
+00273  0906  8D 13 30              STA     CHARS+19
+00274  0909             @NOL       
+00275  0909             
+00276  0909                        ; CHECK IF SCROLL SLOW STAR
+00277  0909  A6 13                 LDX     FRAMECT
+00278  090B  E8                    INX
+00279  090C  86 13                 STX     FRAMECT
+00280  090E  8A                    TXA
+00281  090F  29 01                 AND     #$01
+00282  0911  D0 19                 BNE     @NOS
+00283  0913             
+00284  0913                        ; SCROLL LOW STAR
+00285  0913  18                    CLC
+00286  0914  AD 17 30              LDA     CHARS+23
+00287  0917  6A                    ROR
+00288  0918  8D 17 30              STA     CHARS+23
+00289  091B  AD 1F 30              LDA     CHARS+31
+00290  091E  6A                    ROR
+00291  091F  8D 1F 30              STA     CHARS+31
+00292  0922  90 08                 BCC     @NOR
+00293  0924  AD 17 30              LDA     CHARS+23
+00294  0927  09 80                 ORA     #$80
+00295  0929  8D 17 30              STA     CHARS+23
+00296  092C             @NOR
+00297  092C                        
+00298  092C                        
+00299  092C             @NOS
+00300  092C  A9 00                 LDA     #VIC_BLACK
+00301  092E  8D 20 D0              STA     VIC_BORDERC
+00302  0931             
+00303  0931  4C E4 08              JMP     FOREVER
+00304  0934             
+00305  0934             
+00306  0934             TRIBAND
+00307  0934  A0 00                 LDY     #0
+00308  0936             @NEXTCOLOR 
+00309  0936  91 14                 STA     (CURCOLOR),Y
+00310  0938  C8                    INY
+00311  0939  C0 78                 CPY     #120
+00312  093B  D0 F9                 BNE     @NEXTCOLOR
+00313  093D                        
+00314  093D             
+00315  093D             
+00316  093D  18                    CLC
+00317  093E  A5 14                 LDA CURCOLOR
+00318  0940  69 78                 ADC #<120
+00319  0942  85 14                 STA CURCOLOR
+00320  0944  A5 15                 LDA CURCOLOR+1
+00321  0946  69 00                 ADC #>120
+00322  0948  85 15                 STA CURCOLOR+1
+00323  094A                        
+00324  094A             
+00325  094A  60                    RTS
+00326  094B             
+
+******* 4 Label(s) *******
+forever = $08E4 
+start = $0830 
+triband = $0934 
+WAIT = $08E6 
+
+******* 1 Unused label(s) *******
+@loop
+@nextcolor
+@nol
+@nor
+@nos
+@nulchar
+@rowloop
+start
+
+******* 59 Variable(s) *******
+atemp  = $0012
+chars  = $3000
+charsetend  = $3FFF
+curcolor  = $0014
+framect  = $0013
+screen  = $0400
+scrptr  = $0010
+tgt_c64  = $0001
+VIC_BG0C  = $D021
+VIC_BG1C  = $D022
+VIC_BG2C  = $D023
+VIC_BG3C  = $D024
+VIC_BLACK  = $0000
+VIC_BLUE  = $0006
+VIC_BORDERC  = $D020
+VIC_BROWN  = $0009
+VIC_COLOR  = $D800
+VIC_CYAN  = $0003
+VIC_DARKGREY  = $000B
+VIC_GREEN  = $0005
+VIC_GREY  = $000C
+VIC_LIGHTBLUE  = $000E
+VIC_LIGHTGRAY  = $000F
+VIC_LIGHTGREEN  = $000D
+VIC_LIGHTRED  = $000A
+VIC_MEM  = $D018
+VIC_ORANGE  = $0008
+VIC_RASTER  = $D012
+VIC_RED  = $0002
+VIC_SP0_X  = $D000
+VIC_SP0_Y  = $D001
+VIC_SP0C  = $D027
+VIC_SP0MC  = $D025
+VIC_SP1_X  = $D002
+VIC_SP1_Y  = $D003
+VIC_SP1C  = $D028
+VIC_SP1MC  = $D026
+VIC_SP2_X  = $D004
+VIC_SP2_Y  = $D005
+VIC_SP2C  = $D029
+VIC_SP3_X  = $D006
+VIC_SP3_Y  = $D007
+VIC_SP3C  = $D02A
+VIC_SP4_X  = $D008
+VIC_SP4_Y  = $D009
+VIC_SP4C  = $D02B
+VIC_SP5_X  = $D00A
+VIC_SP5_Y  = $D00B
+VIC_SP5C  = $D02C
+VIC_SP6_X  = $D00C
+VIC_SP6_Y  = $D00D
+VIC_SP6C  = $D02D
+VIC_SP7_X  = $D00E
+VIC_SP7_Y  = $D00F
+VIC_SP7C  = $D02E
+VIC_SPX  = $D010
+VIC_VIOLET  = $0004
+VIC_WHITE  = $0001
+VIC_YELLOW  = $0007
+******* 35 Unused variables(s) *******
+chars
+tgt_c64
+VIC_BG0C
+VIC_BG1C
+VIC_BG2C
+VIC_BG3C
+VIC_BROWN
+VIC_CYAN
+VIC_DARKGREY
+VIC_GREEN
+VIC_GREY
+VIC_LIGHTGRAY
+VIC_LIGHTGREEN
+VIC_ORANGE
+VIC_SP0_X
+VIC_SP0_Y
+VIC_SP0C
+VIC_SP0MC
+VIC_SP1_X
+VIC_SP1_Y
+VIC_SP1C
+VIC_SP1MC
+VIC_SP2_X
+VIC_SP2_Y
+VIC_SP2C
+VIC_SP3_X
+VIC_SP3_Y
+VIC_SP3C
+VIC_SP4_X
+VIC_SP4_Y
+VIC_SP4C
+VIC_SP5_X
+VIC_SP5_Y
+VIC_SP5C
+VIC_SP6_X
+VIC_SP6_Y
+VIC_SP6C
+VIC_SP7_X
+VIC_SP7_Y
+VIC_SP7C
+VIC_SPX
+VIC_VIOLET
+
