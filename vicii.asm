@@ -60,3 +60,6 @@ VIC_SP7C        = $d02e
 ; CONTROL
 VIC_MEM         = $d018
 VIC_RASTER      = $d012
+
+; CIAB
+CIAB_PRA        = $dd00
