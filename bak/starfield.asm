@@ -1,5 +1,3 @@
-##{0:0:0:starfield.prg}D:\dev\c64\StarField\starfield.asm
-
 ; 10 SYS (2096)
 
 GenerateTo      starfield.prg
@@ -317,6 +315,11 @@ objectgen
         ; ******
         ; Move object left
         ; ******
+        lda     ob_l+objtable,x
+        sec
+        sbc     delta
+        sta     ob_l+objtable,x        
+
         lda     ob_x1+objtable,x
         sec
         sbc     delta
@@ -365,6 +368,10 @@ objectgen
         sbc     @hfskiplen
         sta     @hfollowlen
 
+
+; *** NEW STYLE
+
+ 
 
         ; ***********
         ; Paint head
@@ -583,4 +590,3 @@ multable
 ; Objects are 10 bytes, there are 20 of them here
 objtable
         DCB 200,0
-

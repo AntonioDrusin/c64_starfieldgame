@@ -288,7 +288,7 @@ objectgen
 ; VARIABLES
 @curobj          = $ff   ; current object offset, byte
 @vh              = $fe   ; just a variable
-@fflag           = $fd   ; paint head follower ?
+@unused           = $fd   ; 
 @hflag           = $fc   ; paint head ?
 @vhx             = $fb   ; current object x (where head is)
 @hfollowlen      = $fa   ; how long the trail after painting the head
@@ -315,11 +315,6 @@ objectgen
         ; ******
         ; Move object left
         ; ******
-        lda     ob_l+objtable,x
-        sec
-        sbc     delta
-        sta     ob_l+objtable,x        
-
         lda     ob_x1+objtable,x
         sec
         sbc     delta
@@ -330,6 +325,8 @@ objectgen
         cmp     #40
         bmi     @visible
         jmp     @endobj
+
+; *** OLD STYLE
 
 @visible
         ldy     #0
@@ -349,9 +346,6 @@ objectgen
         sta     @hfollowlen     ; this is how long is the head trail to paint.
 @fullhfollow
 
-        lda     #$ab
-        jsr     printa
-
 
         ; calculate how much head trail to skip (in case the trail is too much on the left)
         sec
@@ -361,21 +355,14 @@ objectgen
         lda     #0
 @hfskip
         sta     @hfskiplen
-
+        
+        
         ; how many character to _actually_ paint for the head follow length
         sec
         lda     @hfollowlen
         sbc     @hfskiplen
         sta     @hfollowlen
 
-        ;
-        ; Check if x1 is >38, in that case, no need to paint the head erase column
-        ldy     #0
-        cmp     #39
-        bpl     @nofollow               ; No need to paint the slice next to head
-        ldy     #$ff
-@nofollow        
-        sty     @fflag                   ; if this is on, paint the no erase column
 
         ; ***********
         ; Paint head
@@ -394,22 +381,24 @@ objectgen
 
         ; REQUIREMENT: A is non zero here (last sta is high of screen ptr, which is $8000+)
 
-
         ; top row
         bit     @hflag
         beq     @notophead
         ; Set screen character
-        ldy     @vhx                    ; x = o.x1, we could optimize this to ZEROPAGE
+        ldy     @vhx                    ; x = o.x1
         lda     #o0_fu                  ; *curscrnptr+x     
         sta     (curscrnptr),y
-@notophead
-        ; top row follow
 
-        bit     @fflag                   ; test if need to pain the follow column
-        beq     @notopfollow        
+@notophead
+        ldx     @hfollowlen
+        ; top row follow
+@topfollow
+        dex
+        bmi     @notopfollow
         iny
         lda     #o0_mu
         sta     (curscrnptr),y                
+        jmp     @topfollow
 @notopfollow
         
         ldy     @vh
@@ -418,19 +407,18 @@ objectgen
 
 @moremiddle
         ; Next row
-        clc
-        lda     curscrnptr              ; curscrnptr += 40
-        adc     #40
-        sta     curscrnptr
-        lda     curscrnptr+1
-        adc     #0
-        sta     curscrnptr+1
-
+        clc                             ; 2
+        lda     curscrnptr              ; 3 curscrnptr += 40
+        adc     #40                     ; 2
+        sta     curscrnptr              ; 3
+        lda     curscrnptr+1            ; 3
+        adc     #0                      ; 2
+        sta     curscrnptr+1            ; 3
+                                        
         ; check if we need to paint the middle
         dey
         sty     @vh
         beq     @nomiddle
-
         ; middle
         bit     @hflag
         beq     @nomidhead
@@ -438,17 +426,19 @@ objectgen
         lda     #o0_fm
         sta     (curscrnptr),y
 @nomidhead
+        ldx     @hfollowlen
+@midfollow
         ; middle follow
-        bit     @fflag
-        beq     @nomidfollow
+        dex
+        bmi     @nomidfollow
         iny
         lda     #o0_mm
         sta     (curscrnptr),y
+        jmp     @midfollow
 @nomidfollow
 
         ldy     @vh
         jmp     @moremiddle
-
 
 @nomiddle
         ; bottom
@@ -458,12 +448,16 @@ objectgen
         lda     #o0_fb
         sta     (curscrnptr),y
 @nobothead
+
+        ldx     @hfollowlen
+@bottomfollow
         ; bottom follow
-        bit     @fflag
-        beq     @nobottomfollow
+        dex
+        bmi     @nobottomfollow
         iny
         lda     #o0_mb
         sta     (curscrnptr),y
+        jmp     @bottomfollow
 @nobottomfollow        
 
         
@@ -577,7 +571,8 @@ printa
         sec
         sbc     #$39
 @ok2
-        sta     screen+1       
+        sta     screen+1
+        lda     atemp
         rts
 
 multable
