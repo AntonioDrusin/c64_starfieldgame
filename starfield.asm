@@ -376,7 +376,7 @@ objectgen
         ; 0 or above, means we paint 
         bmi     @notail
         adc     #1
-        sta     @vtc    ; how many trailing chars to pain
+        sta     @vtc    ; how many trailing chars to paint
         lda     #0
         sta     @vtx    ; all get painted at zero
         jmp     @taildone
@@ -392,6 +392,10 @@ objectgen
         sta     curscrnptr
         lda     multable+1,x
         sta     curscrnptr+1
+
+        lda     #VIC_GREEN
+        sta     VIC_BORDERC
+
 
 painttop        
         ldy     @vhx
@@ -412,18 +416,27 @@ painttop
 @notail
 
 nextrow
-        ; Next row
-        clc                             ; 2
+        ; Next row just add 40 to curscrnptr
+        ; carry is never set as we ge here only after x goes to zero
+        ; !OPTIMIZATION
+        clc                             ; 2 NEED THIS AS using INC might leave carry on
         lda     curscrnptr              ; 3 curscrnptr += 40
         adc     #40                     ; 2
         sta     curscrnptr              ; 3
-        lda     curscrnptr+1            ; 3
-        adc     #0                      ; 2
-        sta     curscrnptr+1            ; 3
+        ;!OPTIMIZATION
+        bcc     @nocarry                ; 2 not taken (1 out of 4), 3 taken (3 out of 4)
+        inc     curscrnptr+1            ; 5 1/4 we know we have carry
+        ;clc                             ; 3 1/4 (THIS SAVES 1/4 of a cycle!!??!)
+        ;lda     curscrnptr+1            ; 3 1/4
+        ;adc     #0                      ; 2 1/4
+        ;sta     curscrnptr+1            ; 3 1/4
+@nocarry
+        clc
                                         
         ; check if we need to paint the middle
         dec     @vh
-        bmi     paintend
+        ;!OPTIMIZATION REMOVE SUPPORT FOR 1 ROW OBSTACLES
+        ;bmi     paintend
         beq     paintbottom
 paintmiddle
         ldy     @vhx
@@ -538,7 +551,7 @@ initlevel
 ;       Init objtable with "DEMO" object
         lda     #1
         sta     objtable+ob_type
-        lda     #20
+        lda     #16
         sta     objtable+ob_h
         lda     #20
         sta     objtable+ob_l
