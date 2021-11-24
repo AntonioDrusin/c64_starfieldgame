@@ -47,6 +47,7 @@ ob_y    = 3
 ob_x1   = 4
         
 start
+        
         jsr     initlevel
 
         ; disable CIA interrupt (Is this on by default for BASIC?)
@@ -293,12 +294,14 @@ objectgen
 @vhx             = $fb   ; current object x (where head is)
 @hfollowlen      = $fa   ; how long the trail after painting the head
 @hfskiplen       = $f9   ; how many chars to skip before painting the head trail
+@vtx             = $f8   ; current object x (where head is)
+@vtc             = $f7   ; current object x (where head is)
 
         lda     #VIC_BLUE
         sta     VIC_BORDERC
 
 
-        lda     #2              ; scroll 0-4
+        lda     #1              ; scroll 0-4
         sta     delta           ; Just fixed scrolling by 2
 
         ; object ptr
@@ -308,9 +311,16 @@ objectgen
 
         lda     ob_type+objtable,x      ; test if object is LIVE
         bne     @dothisobject
-        jmp     @endobj
+        jmp     endobj
 
 @dothisobject
+
+        ; ******
+        ; Set vh counter
+        ; ******
+        ldy     ob_h+objtable,x
+        dey
+        sty     @vh
 
         ; ******
         ; Move object left
@@ -319,58 +329,62 @@ objectgen
         sec
         sbc     delta
         sta     ob_x1+objtable,x
+
+        ; @vhx x where the head goes, negative if no head
+        ; @vtx x where the tail goes, negative if no tail
+        ; @vtc count of how many tails to paint
+        cmp     #0
+        bmi     @nohead         ; less than 0, no head painted
+        cmp     #40
+        bpl     @nohead         ; 40 or more, no head (no tail either)
+        sta     @vhx            ; head is at x1
+        jmp     @checktail
+@nohead
+        lda     #-1
         sta     @vhx
 
-        ; avoid painting if x1 is >39 
-        cmp     #40
-        bmi     @visible
-        jmp     @endobj
+@checktail
+        lda     ob_x1+objtable,x       ; this+1 to this+delta is tail
+        cmp     #-1
+        bmi     @tailleft
+; x0 >= -1
+        cmp     #39
+        bpl     @notail
+        
+        clc
+        adc     #1      
+        sta     @vtx                    ; tail is at X1+1
 
-; *** OLD STYLE
-
-@visible
-        ldy     #0
-        lda     @vhx                    ; x1 is head of object
-        bmi     @nohead                 ; if x1 is negative, no need to paint head
-        ldy     #$ff
-@nohead
-        sty     @hflag
-
-        lda     delta
-        sta     @hfollowlen        
+        lda     #40
         sec
-        lda     #39
-        sbc     @vhx            
+        sbc     @vtx
         cmp     delta
-        bpl     @fullhfollow
-        sta     @hfollowlen     ; this is how long is the head trail to paint.
-@fullhfollow
+        bpl     @biggerdelta
+        
+        sta     @vtc
+        jmp     @taildone
 
-
-        ; calculate how much head trail to skip (in case the trail is too much on the left)
-        sec
-        lda     #-1
-        sbc     @vhx
-        bpl     @hfskip
+@biggerdelta
+        lda     delta
+        sta     @vtc
+        jmp     @taildone
+               
+; x0 < -1
+@tailleft
+        clc
+        adc     delta                   ; x0+delta
+        ; 0 or above, means we paint 
+        bmi     @notail
+        adc     #1
+        sta     @vtc    ; how many trailing chars to pain
         lda     #0
-@hfskip
-        sta     @hfskiplen
-        
-        
-        ; how many character to _actually_ paint for the head follow length
-        sec
-        lda     @hfollowlen
-        sbc     @hfskiplen
-        sta     @hfollowlen
-
-
-        ; ***********
-        ; Paint head
-        ; ***********
-
-        lda     ob_h+objtable,x
-        sta     @vh
-
+        sta     @vtx    ; all get painted at zero
+        jmp     @taildone
+@notail
+        lda     #-1
+        sta     @vtx    ; no tail paints at all
+@taildone        
+        ; prepare scrnptr
         lda     ob_y+objtable,x         ; curscrnptr = *(multable+o.y*2)
         asl
         tax                             ; x = o.y*2
@@ -379,33 +393,25 @@ objectgen
         lda     multable+1,x
         sta     curscrnptr+1
 
-        ; REQUIREMENT: A is non zero here (last sta is high of screen ptr, which is $8000+)
-
-        ; top row
-        bit     @hflag
-        beq     @notophead
-        ; Set screen character
-        ldy     @vhx                    ; x = o.x1
-        lda     #o0_fu                  ; *curscrnptr+x     
+painttop        
+        ldy     @vhx
+        bmi     @nohead
+        lda     #o0_fu
         sta     (curscrnptr),y
-
-@notophead
-        ldx     @hfollowlen
-        ; top row follow
-@topfollow
-        dex
-        bmi     @notopfollow
-        iny
-        lda     #o0_mu
-        sta     (curscrnptr),y                
-        jmp     @topfollow
-@notopfollow
         
-        ldy     @vh
-        dey
-        beq     @nohead
+@nohead
+        ldy     @vtx
+        bmi     @notail
+        ldx     @vtc
+        lda     #o0_mu
+@moretail
+        sta     (curscrnptr),y
+        iny
+        dex
+        bne     @moretail
+@notail
 
-@moremiddle
+nextrow
         ; Next row
         clc                             ; 2
         lda     curscrnptr              ; 3 curscrnptr += 40
@@ -416,52 +422,51 @@ objectgen
         sta     curscrnptr+1            ; 3
                                         
         ; check if we need to paint the middle
-        dey
-        sty     @vh
-        beq     @nomiddle
-        ; middle
-        bit     @hflag
-        beq     @nomidhead
-        ldy     @vhx                    ; Set screen character
+        dec     @vh
+        bmi     paintend
+        beq     paintbottom
+paintmiddle
+        ldy     @vhx
+        bmi     @nohead
         lda     #o0_fm
         sta     (curscrnptr),y
-@nomidhead
-        ldx     @hfollowlen
-@midfollow
-        ; middle follow
-        dex
-        bmi     @nomidfollow
-        iny
+        
+@nohead
+        ldy     @vtx
+        bmi     @notail
+        ldx     @vtc
         lda     #o0_mm
+@moretail
         sta     (curscrnptr),y
-        jmp     @midfollow
-@nomidfollow
+        iny
+        dex
+        bne     @moretail
+@notail
+        jmp     nextrow 
 
-        ldy     @vh
-        jmp     @moremiddle
-
-@nomiddle
-        ; bottom
-        bit     @hflag
-        beq     @nobothead
+paintbottom
         ldy     @vhx
+        bmi     @nohead
         lda     #o0_fb
         sta     (curscrnptr),y
-@nobothead
-
-        ldx     @hfollowlen
-@bottomfollow
-        ; bottom follow
-        dex
-        bmi     @nobottomfollow
-        iny
-        lda     #o0_mb
-        sta     (curscrnptr),y
-        jmp     @bottomfollow
-@nobottomfollow        
-
         
-@endobj
+@nohead
+        ldy     @vtx
+        bmi     @notail
+        ldx     @vtc
+        lda     #o0_mb
+@moretail
+        sta     (curscrnptr),y
+        iny
+        dex
+        bne     @moretail
+@notail        
+        
+        ; paints the end of the object
+paintend
+
+
+endobj
         ldx     @curobj                  ; restore cur obj pointer in X
                 ; go the next object, put the current object in x again
         
