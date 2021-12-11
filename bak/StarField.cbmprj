@@ -41,9 +41,10 @@
         <PostBuildCommands />
     </BuildEvents>
     <BuildList>
-        <FileName>starfield.asm</FileName>
         <FileName>macros.asm</FileName>
+        <FileName>utility.asm</FileName>
         <FileName>vicii.asm</FileName>
+        <FileName>starfield.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
@@ -61,7 +62,7 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>False</Topmost>
-            <FileOpen>True</FileOpen>
+            <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>starfield.asm</Name>
@@ -73,6 +74,17 @@
             <Bookmarks />
             <Topmost>True</Topmost>
             <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>utility.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>False</FileOpen>
         </SourceFile>
         <SourceFile>
             <Name>vicii.asm</Name>

@@ -1,1 +1,6 @@
 ./bak
+*.dbg
+*.tmp
+*.dmp
+*.prg
+
