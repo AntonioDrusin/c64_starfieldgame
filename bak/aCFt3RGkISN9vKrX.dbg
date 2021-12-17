@@ -9,185 +9,301 @@
             <LabelValue>2096</LabelValue>
         </Label>
         <Label>
+            <LabelText>@again</LabelText>
+            <LabelValue>2096</LabelValue>
+        </Label>
+        <Label>
             <LabelText>@rowloop</LabelText>
-            <LabelValue>2184</LabelValue>
+            <LabelValue>2187</LabelValue>
         </Label>
         <Label>
             <LabelText>@loop</LabelText>
-            <LabelValue>2186</LabelValue>
+            <LabelValue>2189</LabelValue>
         </Label>
         <Label>
             <LabelText>@nulchar</LabelText>
-            <LabelValue>2275</LabelValue>
+            <LabelValue>2278</LabelValue>
         </Label>
         <Label>
             <LabelText>forever</LabelText>
-            <LabelValue>2295</LabelValue>
+            <LabelValue>2298</LabelValue>
         </Label>
         <Label>
             <LabelText>WAIT</LabelText>
-            <LabelValue>2297</LabelValue>
+            <LabelValue>2300</LabelValue>
         </Label>
         <Label>
             <LabelText>@nol</LabelText>
-            <LabelValue>2332</LabelValue>
+            <LabelValue>2335</LabelValue>
         </Label>
         <Label>
             <LabelText>@nor</LabelText>
-            <LabelValue>2367</LabelValue>
+            <LabelValue>2370</LabelValue>
         </Label>
         <Label>
             <LabelText>@nos</LabelText>
-            <LabelValue>2367</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>objectgen</LabelText>
-            <LabelValue>2367</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@dothisobject</LabelText>
-            <LabelValue>2388</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>paintthis</LabelText>
-            <LabelValue>2410</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@nohead</LabelText>
-            <LabelValue>2423</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@checktail</LabelText>
-            <LabelValue>2427</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@biggerdelta</LabelText>
-            <LabelValue>2457</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@tailleft</LabelText>
-            <LabelValue>2464</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@notail</LabelText>
-            <LabelValue>2480</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@taildone</LabelText>
-            <LabelValue>2484</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>painttop</LabelText>
-            <LabelValue>2504</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~nohead{00002}</LabelText>
-            <LabelValue>2512</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~moretail{00002}</LabelText>
-            <LabelValue>2520</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~notail{00002}</LabelText>
-            <LabelValue>2526</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>nextrow</LabelText>
-            <LabelValue>2526</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@nocarry</LabelText>
-            <LabelValue>2537</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@paintmiddle</LabelText>
-            <LabelValue>2544</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~nohead{00003}</LabelText>
-            <LabelValue>2552</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~moretail{00003}</LabelText>
-            <LabelValue>2560</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~notail{00003}</LabelText>
-            <LabelValue>2566</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>paintbottom</LabelText>
-            <LabelValue>2569</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~nohead{00004}</LabelText>
-            <LabelValue>2577</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~moretail{00004}</LabelText>
-            <LabelValue>2585</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>~~~notail{00004}</LabelText>
-            <LabelValue>2591</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>paintend</LabelText>
-            <LabelValue>2591</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>endobj</LabelText>
-            <LabelValue>2591</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>triband</LabelText>
-            <LabelValue>2601</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@nextcolor</LabelText>
-            <LabelValue>2603</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>initmultable</LabelText>
-            <LabelValue>2624</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@next</LabelText>
-            <LabelValue>2636</LabelValue>
-        </Label>
-        <Label>
-            <LabelText>@done</LabelText>
-            <LabelValue>2667</LabelValue>
+            <LabelValue>2370</LabelValue>
         </Label>
         <Label>
             <LabelText>initlevel</LabelText>
-            <LabelValue>2668</LabelValue>
+            <LabelValue>2393</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>triband</LabelText>
+            <LabelValue>2412</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@nextcolor</LabelText>
+            <LabelValue>2414</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>initmultable</LabelText>
+            <LabelValue>2435</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@next</LabelText>
+            <LabelValue>2447</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@done</LabelText>
+            <LabelValue>2478</LabelValue>
         </Label>
         <Label>
             <LabelText>printa</LabelText>
-            <LabelValue>2702</LabelValue>
+            <LabelValue>2479</LabelValue>
         </Label>
         <Label>
             <LabelText>@ok1</LabelText>
-            <LabelValue>2719</LabelValue>
+            <LabelValue>2496</LabelValue>
         </Label>
         <Label>
             <LabelText>@ok2</LabelText>
-            <LabelValue>2735</LabelValue>
+            <LabelValue>2512</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>objectgen</LabelText>
+            <LabelValue>2518</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintObjects</LabelText>
+            <LabelValue>2518</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@dothisobject</LabelText>
+            <LabelValue>2541</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintthis</LabelText>
+            <LabelValue>2563</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@nohead</LabelText>
+            <LabelValue>2576</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@checktail</LabelText>
+            <LabelValue>2580</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@biggerdelta</LabelText>
+            <LabelValue>2610</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@tailleft</LabelText>
+            <LabelValue>2617</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@notail</LabelText>
+            <LabelValue>2633</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@taildone</LabelText>
+            <LabelValue>2637</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>painttop</LabelText>
+            <LabelValue>2657</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00006}</LabelText>
+            <LabelValue>2665</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00006}</LabelText>
+            <LabelValue>2673</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00006}</LabelText>
+            <LabelValue>2679</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>nextrow</LabelText>
+            <LabelValue>2679</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@nocarry</LabelText>
+            <LabelValue>2690</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@paintmiddle</LabelText>
+            <LabelValue>2697</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00007}</LabelText>
+            <LabelValue>2705</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00007}</LabelText>
+            <LabelValue>2713</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00007}</LabelText>
+            <LabelValue>2719</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintbottom</LabelText>
+            <LabelValue>2722</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00008}</LabelText>
+            <LabelValue>2730</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00008}</LabelText>
+            <LabelValue>2738</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00008}</LabelText>
+            <LabelValue>2744</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintend</LabelText>
+            <LabelValue>2744</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintThisRight</LabelText>
+            <LabelValue>2774</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@nohead</LabelText>
+            <LabelValue>2787</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@checktail</LabelText>
+            <LabelValue>2791</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@biggerdelta</LabelText>
+            <LabelValue>2821</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@tailleft</LabelText>
+            <LabelValue>2828</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@notail</LabelText>
+            <LabelValue>2844</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@taildone</LabelText>
+            <LabelValue>2848</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>painttopright</LabelText>
+            <LabelValue>2870</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00010}</LabelText>
+            <LabelValue>2878</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00010}</LabelText>
+            <LabelValue>2886</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00010}</LabelText>
+            <LabelValue>2892</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>nextrowright</LabelText>
+            <LabelValue>2892</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@nocarry</LabelText>
+            <LabelValue>2903</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@paintmiddle</LabelText>
+            <LabelValue>2910</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00011}</LabelText>
+            <LabelValue>2918</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00011}</LabelText>
+            <LabelValue>2926</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00011}</LabelText>
+            <LabelValue>2932</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintbottomright</LabelText>
+            <LabelValue>2935</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~nohead{00012}</LabelText>
+            <LabelValue>2943</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~moretail{00012}</LabelText>
+            <LabelValue>2951</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>~~~notail{00012}</LabelText>
+            <LabelValue>2957</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>paintendright</LabelText>
+            <LabelValue>2957</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>endobj</LabelText>
+            <LabelValue>2957</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>activateObjects</LabelText>
+            <LabelValue>2960</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@activate</LabelText>
+            <LabelValue>2991</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@findNext</LabelText>
+            <LabelValue>2995</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@found</LabelText>
+            <LabelValue>3012</LabelValue>
+        </Label>
+        <Label>
+            <LabelText>@noop</LabelText>
+            <LabelValue>3050</LabelValue>
         </Label>
         <Label>
             <LabelText>multable</LabelText>
-            <LabelValue>2741</LabelValue>
+            <LabelValue>3051</LabelValue>
         </Label>
         <Label>
-            <LabelText>objtable</LabelText>
-            <LabelValue>2791</LabelValue>
+            <LabelText>level</LabelText>
+            <LabelValue>3101</LabelValue>
         </Label>
     </Labels>
     <DebuggerStartAddress>2096</DebuggerStartAddress>
     <WatchList />
     <Breakpoints />
     <LONGAITransitions />
-    <Binary>DggKAJ4gKDIwOTYpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgbAqtDtwp/o0O3HggQAqlASn7hQGpAKDQhV+EYKn/oN+FWoRbqf+gv4VYhFkgv6OlASn4CQWFAa0A3Sn8CQGNAN2tGNAp8AkMjRjQqQCFEKmEhRGiGakkoCeREEkBiBD5SQGFEhilEGkohRClEWkAhRGlEsrQ4akAjSDQjSHQqQCFFKnYhRWpBiApCqkOICkKqQcgKQqpASApCqkBICkKqQcgKQqpCiApCqkCICkKqQCiD50gscoQ+qkQjSOxqQKNL7GpAIUTqf/NEtDQ+6kCjSDQGK0rsSqNK7GtI7EqjSOxkAitK7EJAY0rsaYT6IYTiikB0BkYrS+xKo0vsa0nsSqNJ7GQCK0vsQkBjS+xqQaNINCpAoUhogCG/73nCtADTB8KvOgKiIT+vesKOOUhnesKyfwQA0wfCskAMAnJKBAFhftMewmp/4X7vesKyf8wHsknECoYaQGF+KkoOOX4xSEQBYX3TLQJpSGF90y0CRhlITALaQGF96kAhfhMtAmp/4X4veoKCqq9tQqFGL22CoUZqQWNINCk+zAEqVWRGKT4MAqm96lDkRjIytD6GKUYaSiFGJAC5hkYxv4wMfAZpPswBKlCkRik+DAKpvepZpEYyMrQ+kzeCaT7MASpSpEYpPgwCqb3qUORGMjK0Pqm/6kAjSDQTPcIoACRFMjAeND5GKUUaXiFFKUVaQCFFWCpAIUWqYSFF6IAoBmlFp21CuilF521CuiI8BAYpRZpKIUWpRdpAIUXTEwKYKkBhSGpAY3nCqkQjegKqRSN6QqpA43qCqkojesKqQCFIGCFEkpKSkopDwkwyTowAzjpOY0AhKUSKQ8JMMk6MAM46TmNAYSlEmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</Binary>
+    <Binary>DggKAJ4gKDIwOTYpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABMMAggWQmtDtwp/o0O3HgggwmlASn7hQGpAKDQhV+EYKn/oN+FWoRbqf+gv4VYhFkgv6OlASn4CQWFAa0A3Sn8CQGNAN2tGNAp8AkMjRjQqQCFEKmEhRGiGakkoCeREEkBiBD5SQGFEhilEGkohRClEWkAhRGlEsrQ4akAjSDQjSHQqQCFFKnYhRWpBiBsCakOIGwJqQcgbAmpASBsCakBIGwJqQcgbAmpCiBsCakCIGwJqQCiD50gscoQ+qkQjSOxqQKNL7GpAIUTqf/NEtDQ+6kCjSDQGK0rsSqNK7GtI7EqjSOxkAitK7EJAY0rsaYT6IYTiikB0BkYrS+xKo0vsa0nsSqNJ7GQCK0vsQkBjS+xSKkKjSDQaCCQCyDWCUipAI0g0GhM+gipAYUhqQCFIoUjqR2FJKkMhSVgoACRFMjAeND5GKUUaXiFFKUVaQCFFWCpAIUWqYSFF6IAoBmlFp3rC+ilF53rC+iI8BAYpRZpKIUWpRdpAIUXTI8JYIUSSkpKSikPCTDJOjADOOk5jQCEpRIpDwkwyTowAzjpOY0BhKUSYEipBo0g0GipBIUhogCG/70AwNADTI0LvAHAiIT+vQTAOOUhnQTAyfwQA0y4CskAMAnJKBAFhftMFAqp/4X7vQTAyf8wHsknECoYaQGF+qkoOOX6xSEQBYX5TE0KpSGF+UxNChhlITALaQGF+akAhfpMTQqp/4X6qQWNINC9A8AKqr3rC4UYvewLhRmk+zAEqVWRGKT6MAqm+alDkRjIytD6GKUYaSiFGJAC5hkYxv4wMfAZpPswBKlCkRik+jAKpvmpZpEYyMrQ+kx3CqT7MASpSpEYpPowCqb5qUORGMjK0PqpBo0g0Kb/vAHAiIT+vQTAGG0CwJ0FwMn8EANMjQvJADAJySgQBYX7TOcKqf+F+70FwMn/MB7JJxAqGGkBhfqpKDjl+sUhEAWF+UwgC6UhhflMIAsYZSEwC2kBhfmpAIX6TCALqf+F+kipDY0g0Gi9A8AKqr3rC4UYvewLhRmk+zAEqUmRGKT6MAqm+akkkRjIytD6GKUYaSiFGJAC5hkYxv4wMfAZpPswBKlIkRik+jAKpvmpJJEYyMrQ+kxMC6T7MASpS5EYpPowCqb5qSSRGMjK0Pqm/2AYpSJpAYUipSNpAIUjoAWxJMUjMAqIsSTFIjADTOoLoAqiAL0AwPAMihhpBqrJPDDyTOoLoACxJJ0AwMixJJ0BwMixJJ0CwMixJJ0DwMjIsSQ45SMYaTKdBMBgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB4DCgABBB4PHgABBB4UPAABBB4UeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</Binary>
 </DebugInfo>

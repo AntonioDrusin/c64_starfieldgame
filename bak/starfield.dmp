@@ -1,898 +1,1063 @@
 00001  0000             ; 10 SYS (2096)
 00002  0001             GENERATETO STARFIELD.PRG
 00003  0001             DEBUGSTARTADDRESS START
-00004  0001             VIC_COLOR  = $D800
-00005  0001             
-00006  0001             ; COLORS
-00007  0001             VIC_BLACK  = $00
-00008  0001             VIC_WHITE  = $01
-00009  0001             VIC_RED    = $02
-00010  0001             VIC_CYAN   = $03
-00011  0001             VIC_VIOLET = $04
-00012  0001             VIC_GREEN  = $05
-00013  0001             VIC_BLUE   = $06
-00014  0001             VIC_YELLOW = $07
-00015  0001             VIC_ORANGE = $08
-00016  0001             VIC_BROWN  = $09
-00017  0001             VIC_LIGHTRED = $0A
-00018  0001             VIC_DARKGREY = $0B
-00019  0001             VIC_GREY   = $0C
-00020  0001             VIC_LIGHTGREEN = $0D
-00021  0001             VIC_LIGHTBLUE = $0E
-00022  0001             VIC_LIGHTGRAY = $0F
-00023  0001             
-00024  0001             ; REGISTERS
+00004  0001                        
+00005  0001             ; INCLUDE MACROS AND DEFINITIONS
+00006  0001             VIC_COLOR  = $D800
+00007  0001             
+00008  0001             ; COLORS
+00009  0001             VIC_BLACK  = $00
+00010  0001             VIC_WHITE  = $01
+00011  0001             VIC_RED    = $02
+00012  0001             VIC_CYAN   = $03
+00013  0001             VIC_VIOLET = $04
+00014  0001             VIC_GREEN  = $05
+00015  0001             VIC_BLUE   = $06
+00016  0001             VIC_YELLOW = $07
+00017  0001             VIC_ORANGE = $08
+00018  0001             VIC_BROWN  = $09
+00019  0001             VIC_LIGHTRED = $0A
+00020  0001             VIC_DARKGREY = $0B
+00021  0001             VIC_GREY   = $0C
+00022  0001             VIC_LIGHTGREEN = $0D
+00023  0001             VIC_LIGHTBLUE = $0E
+00024  0001             VIC_LIGHTGRAY = $0F
 00025  0001             
-00026  0001             ; SPRITES
-00027  0001             VIC_SP0_X  = $D000
-00028  0001             VIC_SP0_Y  = $D001
-00029  0001             VIC_SP1_X  = $D002
-00030  0001             VIC_SP1_Y  = $D003
-00031  0001             VIC_SP2_X  = $D004
-00032  0001             VIC_SP2_Y  = $D005
-00033  0001             VIC_SP3_X  = $D006
-00034  0001             VIC_SP3_Y  = $D007
-00035  0001             VIC_SP4_X  = $D008
-00036  0001             VIC_SP4_Y  = $D009
-00037  0001             VIC_SP5_X  = $D00A
-00038  0001             VIC_SP5_Y  = $D00B
-00039  0001             VIC_SP6_X  = $D00C
-00040  0001             VIC_SP6_Y  = $D00D
-00041  0001             VIC_SP7_X  = $D00E
-00042  0001             VIC_SP7_Y  = $D00F
-00043  0001             VIC_SPX    = $D010
-00044  0001             
-00045  0001             ; COLORS
-00046  0001             VIC_BORDERC = $D020
-00047  0001             VIC_BG0C   = $D021
-00048  0001             VIC_BG1C   = $D022
-00049  0001             VIC_BG2C   = $D023
-00050  0001             VIC_BG3C   = $D024
-00051  0001             VIC_SP0MC  = $D025
-00052  0001             VIC_SP1MC  = $D026
-00053  0001             VIC_SP0C   = $D027
-00054  0001             VIC_SP1C   = $D028
-00055  0001             VIC_SP2C   = $D029
-00056  0001             VIC_SP3C   = $D02A
-00057  0001             VIC_SP4C   = $D02B
-00058  0001             VIC_SP5C   = $D02C
-00059  0001             VIC_SP6C   = $D02D
-00060  0001             VIC_SP7C   = $D02E
-00061  0001             
-00062  0001             
-00063  0001             ; CONTROL
-00064  0001             VIC_MEM    = $D018
-00065  0001             VIC_RASTER = $D012
-00066  0001             
-00067  0001             ; CIAB
-00068  0001             CIAB_PRA   = $DD00
-00069  0001             ; ******************************************************
-00070  0001             ; COLORS BACKGROUND TO MEASURE PERFORMANCE
-00071  0001             ;
-00072  0001             ; EX:
-00073  0001             ; PERFMARK VIC_YELLOW
-00074  0001             ; ******************************************************
-00075  0001             
-00076  0001             DEFM       PERFMARK
-00077  0001                        PHA
-00078  0001                        LDA            #/1
-00079  0001                        STA            VIC_BORDERC
-00080  0001                        PLA
-00081  0001                        ENDM
-00082  0001             
-00083  0001             ; ******************************************************
-00084  0001             ; ADDS CONSTANT TO CONTENTS OF IMMEDIATE MEMORY ADDRESS
-00085  0001             ;
-00086  0001             ; EX:
-00087  0001             ; ADDAW 33, SCREENPTR
-00088  0001             ; ******************************************************
-00089  0001             
-00090  0001             DEFM       ADDAW
-00091  0001                        CLC
-00092  0001                        LDA            /2
-00093  0001                        ADC            #</1
-00094  0001                        STA            /2
-00095  0001                        LDA            /2+1
-00096  0001                        ADC            #>/1
-00097  0001                        STA            /2+1
-00098  0001                        ENDM
-00099  0001             
-00100  0001             ; ******************************************************
-00101  0001             ; MOVES CONSTANT TO CONTENTS OF IMMEDIATE MEMORY ADDRESS
-00102  0001             ;
-00103  0001             ; EX:
-00104  0001             ; MOVEW 0, SCREENPTR
-00105  0001             ; ******************************************************
-00106  0001             
-00107  0001             DEFM       MOVEW
-00108  0001                        LDA            #</1
-00109  0001                        STA            /2
-00110  0001                        LDA            #>/1
-00111  0001                        STA            /2+1
-00112  0001                        ENDM
-00113  0001             
-00114  0001                        
-00115  0001             *=$0801
-00116  0801  0E 08 0A              BYTE           $0E, $08, $0A, $00, $9E, $20, $28,  $32, $30, $39, $36, $29, $00, $00, $00
-00117  0810             *=$830
-00118  0830             SCREEN     = $8400
-00119  0830             CHARS      = $B000
-00120  0830             CHARSETEND = $BFFF
-00121  0830             ; STARSCROLLER
-00122  0830             STARCHAR   = 36
-00123  0830             STAR_CHARS0 = CHARS+288
-00124  0830             STAR_CHARS1 = CHARS+296
-00125  0830             ; *********************
-00126  0830             ; ZERO PAGE VARIABLES
-00127  0830             ; *********************
-00128  0830             ; VARIABLES
-00129  0830             SCRPTR_W   = $10                    ; FOR CHARACTER FILLING
-00130  0830             ATEMP      = $12                    ; STORE A SOMETIMES
-00131  0830             FRAMECT    = $13
-00132  0830             CURCOLOR_W= $14                    ; WORD
-00133  0830             CURPTR     = $16                    ; GENERIC POINTER
-00134  0830             CURSCRNPTR = $18                    ; GENERIC SCREEN POINTER
-00135  0830             UNUSED0    = $20
-00136  0830             DELTA      = $21                    ; DELTA CHARACTERS FOR SCREEN SCROLL
-00137  0830             STAGEX_W   = $22                    ; CURRENT POSITION OF THE STAGE
-00138  0830             LEVELPTR_W= $24                    ; POINTER TO THE CURRENTLY EVALUATED OBJECT IN THE LEVEL
-00139  0830                        
-00140  0830             ; TEMP VARIABLES FOR PROGRAMS:
-00141  0830             ; $FF DESCENDING
-00142  0830             OB_TYPE    = 0
-00143  0830             OB_H       = 1
-00144  0830             OB_L       = 2
-00145  0830             OB_Y       = 3
-00146  0830             OB_X1      = 4
-00147  0830             OB_X2      = 5
-00148  0830             OB_SIZE    = 6
-00149  0830                        
-00150  0830             START
-00151  0830  20 80 0B              JSR            INITLEVEL
-00152  0833                        ; DISABLE CIA INTERRUPT (IS THIS ON BY DEFAULT FOR BASIC?)
-00153  0833                        ; THIS IS IMPORTANT OR THE COPY CHAR ROUTINE WILL CRASH FOR SOME REASON
-00154  0833  AD 0E DC              LDA            $DC0E
-00155  0836  29 FE                 AND            #$FE
-00156  0838  8D 0E DC              STA            $DC0E
-00157  083B                        ; DISABLE ALL CPU INTERRUPT
-00158  083B  78                    SEI
-00159  083C  20 2D 0B              JSR            INITMULTABLE
-00160  083F                        ; DEBUG HERE
-00161  083F                        ; END DEBUG
-00162  083F  A5 01                 LDA            $1
-00163  0841  29 FB                 AND            #$FB
-00164  0843  85 01                 STA            $1        ; CHAR ROM VISIBLE AT $D000
-00165  0845             ; **********
-00166  0845             ; COPY CHARS
-00167  0845             ; **********
-00168  0845                        ; HTTPS://WWW.PAGETABLE.COM/C64REF/C64DISASM/
-00169  0845  A9 00                 LDA            #$0
-00170  0847  A0 D0                 LDY            #$D0
-00171  0849  85 5F                 STA            95
-00172  084B  84 60                 STY            96
-00173  084D  A9 FF                 LDA            #$FF
-00174  084F  A0 DF                 LDY            #$DF
-00175  0851  85 5A                 STA            90
-00176  0853  84 5B                 STY            91
-00177  0855  A9 FF                 LDA            #<CHARSETEND; MUST KEEP THESE VALUES IN A AND Y
-00178  0857  A0 BF                 LDY            #>CHARSETEND
-00179  0859  85 58                 STA            88
-00180  085B  84 59                 STY            89
-00181  085D  20 BF A3              JSR            $A3BF     ; BLOCK COPY
-00182  0860  A5 01                 LDA            $1
-00183  0862  29 F8                 AND            #$F8
-00184  0864  09 05                 ORA            #$05      ; ALL RAM, EXCEPT FOR I/O
-00185  0866  85 01                 STA            $1
-00186  0868                        ; VIC II ON BANK 2 ($8000-$BFFF)
-00187  0868  AD 00 DD              LDA            CIAB_PRA
-00188  086B  29 FC                 AND            #$FC
-00189  086D  09 01                 ORA            #$1
-00190  086F  8D 00 DD              STA            CIAB_PRA
-00191  0872                        ; SELECT VIC CHARACTER BANK TO $3000
-00192  0872  AD 18 D0              LDA            VIC_MEM   ; DEFAULT $15
-00193  0875  29 F0                 AND            #$F0
-00194  0877  09 0C                 ORA            #$0C
-00195  0879  8D 18 D0              STA            VIC_MEM   ; $1C
-00196  087C             ; ******************************************
-00197  087C             ; FILL SCREEN WITH ALTERNATING BC CHARACTERS
-00198  087C             ; ******************************************
-00199  087C             
-00200  087C             
-00201  087C  A9 00                 LDA            #<SCREEN
-00202  087E  85 10                 STA            SCRPTR_W
-00203  0880  A9 84                 LDA            #>SCREEN
-00204  0882  85 11                 STA            SCRPTR_W+1
-00205  0884  A2 19                 LDX            #25       ; 25 LINES
-00206  0886  A9 24                 LDA            #STARCHAR ; FIRST OF TWO ALTERNATING CHARS
-00207  0888             @ROWLOOP
-00208  0888  A0 27                 LDY            #39
-00209  088A             @LOOP
-00210  088A  91 10                 STA            (SCRPTR_W),Y
-00211  088C  49 01                 EOR            #$1       ; OTHER CHARACTER
-00212  088E  88                    DEY
-00213  088F  10 F9                 BPL            @LOOP
-00214  0891  49 01                 EOR            #$1
-00215  0893  85 12                 STA            ATEMP
-00216  0895             
-00217  0895             
-00218  0895  18                    CLC
-00219  0896  A5 10                 LDA            SCRPTR_W
-00220  0898  69 28                 ADC            #<40
-00221  089A  85 10                 STA            SCRPTR_W
-00222  089C  A5 11                 LDA            SCRPTR_W+1
-00223  089E  69 00                 ADC            #>40
-00224  08A0  85 11                 STA            SCRPTR_W+1
-00225  08A2  A5 12                 LDA            ATEMP
-00226  08A4  CA                    DEX
-00227  08A5  D0 E1                 BNE            @ROWLOOP
-00228  08A7             ; ************
-00229  08A7             ; SETUP COLORS
-00230  08A7             ; ************
-00231  08A7  A9 00                 LDA            #$0
-00232  08A9  8D 20 D0              STA            $D020     ; BORDER
-00233  08AC  8D 21 D0              STA            $D021     ; BACKGROUND
-00234  08AF  A9 00                 LDA            #<VIC_COLOR
-00235  08B1  85 14                 STA            CURCOLOR_W
-00236  08B3  A9 D8                 LDA            #>VIC_COLOR
-00237  08B5  85 15                 STA            CURCOLOR_W+1
-00238  08B7  A9 06                 LDA            #VIC_BLUE
-00239  08B9  20 16 0B              JSR            TRIBAND
-00240  08BC  A9 0E                 LDA            #VIC_LIGHTBLUE
-00241  08BE  20 16 0B              JSR            TRIBAND
-00242  08C1  A9 07                 LDA            #VIC_YELLOW
-00243  08C3  20 16 0B              JSR            TRIBAND
-00244  08C6  A9 01                 LDA            #VIC_WHITE
-00245  08C8  20 16 0B              JSR            TRIBAND
-00246  08CB  A9 01                 LDA            #VIC_WHITE
-00247  08CD  20 16 0B              JSR            TRIBAND
-00248  08D0  A9 07                 LDA            #VIC_YELLOW
-00249  08D2  20 16 0B              JSR            TRIBAND
-00250  08D5  A9 0A                 LDA            #VIC_LIGHTRED
-00251  08D7  20 16 0B              JSR            TRIBAND
-00252  08DA  A9 02                 LDA            #VIC_RED
-00253  08DC  20 16 0B              JSR            TRIBAND
-00254  08DF             ; ********************
-00255  08DF             ; PREP STAR CHARACTERS
-00256  08DF             ; ********************
-00257  08DF                        ; STARS ARE ON LINE 3
-00258  08DF                        ; AND ON LINE 7
-00259  08DF  A9 00                 LDA            #$0
-00260  08E1  A2 0F                 LDX            #15
-00261  08E3             @NULCHAR
-00262  08E3  9D 20 B1              STA            STAR_CHARS0,X
-00263  08E6  CA                    DEX
-00264  08E7  10 FA                 BPL            @NULCHAR
-00265  08E9  A9 10                 LDA            #$10
-00266  08EB  8D 23 B1              STA            STAR_CHARS0+3
-00267  08EE  A9 02                 LDA            #$02
-00268  08F0  8D 2F B1              STA            STAR_CHARS1+7
-00269  08F3             ; *********
-00270  08F3             ; MAIN LOOP
-00271  08F3             ; *********
-00272  08F3  A9 00                 LDA            #$00
-00273  08F5  85 13                 STA            FRAMECT
-00274  08F7             FOREVER
-00275  08F7  A9 FF                 LDA            #$FF
-00276  08F9             WAIT
-00277  08F9  CD 12 D0              CMP            VIC_RASTER
-00278  08FC  D0 FB                 BNE            WAIT
-00279  08FE  A9 02                 LDA            #VIC_RED
-00280  0900  8D 20 D0              STA            VIC_BORDERC
-00281  0903             ;**********************
-00282  0903             ; BACKGROUND SCROLLING
-00283  0903             ;**********************
-00284  0903                        ; SCROLL FAST STAR
-00285  0903  18                    CLC
-00286  0904  AD 2B B1              LDA            STAR_CHARS1+3
-00287  0907  2A                    ROL
-00288  0908  8D 2B B1              STA            STAR_CHARS1+3
-00289  090B  AD 23 B1              LDA            STAR_CHARS0+3
-00290  090E  2A                    ROL
-00291  090F  8D 23 B1              STA            STAR_CHARS0+3
-00292  0912  90 08                 BCC            @NOL
-00293  0914  AD 2B B1              LDA            STAR_CHARS1+3
-00294  0917  09 01                 ORA            #$01
-00295  0919  8D 2B B1              STA            STAR_CHARS1+3
-00296  091C             @NOL
-00297  091C                        ; CHECK IF SCROLL SLOW STAR
-00298  091C  A6 13                 LDX            FRAMECT
-00299  091E  E8                    INX
-00300  091F  86 13                 STX            FRAMECT
-00301  0921  8A                    TXA
-00302  0922  29 01                 AND            #$01
-00303  0924  D0 19                 BNE            @NOS
-00304  0926                        ; SCROLL LOW STAR
-00305  0926  18                    CLC
-00306  0927  AD 2F B1              LDA            STAR_CHARS1+7
-00307  092A  2A                    ROL
-00308  092B  8D 2F B1              STA            STAR_CHARS1+7
-00309  092E  AD 27 B1              LDA            STAR_CHARS0+7
-00310  0931  2A                    ROL
-00311  0932  8D 27 B1              STA            STAR_CHARS0+7
-00312  0935  90 08                 BCC            @NOR
-00313  0937  AD 2F B1              LDA            STAR_CHARS1+7
-00314  093A  09 01                 ORA            #$01
-00315  093C  8D 2F B1              STA            STAR_CHARS1+7
-00316  093F             @NOR
-00317  093F             @NOS
-00318  093F             
-00319  093F             
-00320  093F             ;*********************************
-00321  093F             ;** ACTIVATES OBJECTS
-00322  093F             ;*********************************
-00323  093F             ; VARIABLES
-00324  093F             CURSRCPTR  = $FE
-00325  093F             
-00326  093F             
-00327  093F             
-00328  093F             
-00329  093F  48                    PHA
-00330  0940  A9 0A                 LDA            #VIC_LIGHTRED
-00331  0942  8D 20 D0              STA            VIC_BORDERC
-00332  0945  68                    PLA
-00333  0946             ACTIVATEOBJECTS 
-00334  0946                        ; INCREMENT STAGEX BY ONE
-00335  0946  18                    CLC
-00336  0947  A5 22                 LDA            STAGEX_W
-00337  0949  69 01                 ADC            #1
-00338  094B  85 22                 STA            STAGEX_W
-00339  094D  A5 23                 LDA            STAGEX_W+1
-00340  094F  69 00                 ADC            #0
-00341  0951  85 23                 STA            STAGEX_W+1
-00342  0953             
-00343  0953             
-00344  0953             ; ******************
-00345  0953             ; SCROLL FRONT
-00346  0953             ; ******************
-00347  0953                        ; CHARACTERS USED FOR SCROLLING
-00348  0953             O0_FU      = 85                     ; FRONT UP
-00349  0953             O0_FM      = 66                     ; FRONT MIDDLE
-00350  0953             O0_FB      = 74                     ; FRONT BOTTOM
-00351  0953             O0_MU      = 67                     ; MIDDLE UP
-00352  0953             O0_MM      = 102                    ; MIDDLE MIDDLE
-00353  0953             O0_MB      = 67                     ; MIDDLE BOTTOM
-00354  0953             O0_BU      = 73                     ; BACK UP
-00355  0953             O0_BM      = 72                     ; BACK MIDDLE
-00356  0953             O0_BB      = 75                     ; BACK BOTTOM
-00357  0953             OBJECTGEN
-00358  0953             ; VARIABLES
-00359  0953             @CUROBJ    = $FF                    ; CURRENT OBJECT OFFSET, BYTE
-00360  0953             @VH        = $FE                    ; JUST A VARIABLE
-00361  0953             @UNUSED    = $FD                    ;
-00362  0953             @HFLAG     = $FC                    ; PAINT HEAD ?
-00363  0953             @VHX       = $FB                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
-00364  0953             @VTX       = $FA                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
-00365  0953             @VTC       = $F9                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
-00366  0953                        
-00367  0953             PAINTOBJECTS 
-00368  0953             
-00369  0953             
-00370  0953  48                    PHA
-00371  0954  A9 06                 LDA            #VIC_BLUE
-00372  0956  8D 20 D0              STA            VIC_BORDERC
-00373  0959  68                    PLA
-00374  095A                        
-00375  095A                        
-00376  095A  A9 04                 LDA            #4        ; SCROLL 0-4
-00377  095C  85 21                 STA            DELTA     ; JUST FIXED SCROLLING BY 2
-00378  095E                        ; OBJECT PTR
-00379  095E  A2 00                 LDX            #0
-00380  0960  86 FF                 STX            @CUROBJ
-00381  0962  BD C5 0B              LDA            OB_TYPE+OBJTABLE,X; TEST IF OBJECT IS LIVE
-00382  0965  D0 03                 BNE            @DOTHISOBJECT
-00383  0967  4C 0A 0B              JMP            ENDOBJ
-00384  096A             @DOTHISOBJECT 
-00385  096A                        ; SET VH COUNTER
-00386  096A  BC C6 0B              LDY            OB_H+OBJTABLE,X
-00387  096D  88                    DEY
-00388  096E  84 FE                 STY            @VH
-00389  0970                        ; MOVE OBJECT LEFT
-00390  0970  BD C9 0B              LDA            OB_X1+OBJTABLE,X
-00391  0973  38                    SEC
-00392  0974  E5 21                 SBC            DELTA
-00393  0976  9D C9 0B              STA            OB_X1+OBJTABLE,X
-00394  0979             ; *******************************
-00395  0979             ; ** LEFT SIDE
-00396  0979             ; *******************************
-00397  0979                        ; IF X1 IS MORE THAN 4 OUTSIDE, THERE IS NOTHING TO PAINT HERE
-00398  0979  C9 FC                 CMP            #-4
-00399  097B  10 03                 BPL            PAINTTHIS
-00400  097D  4C 35 0A              JMP            PAINTEND
-00401  0980             PAINTTHIS
-00402  0980                        ; @VHX X WHERE THE HEAD GOES, NEGATIVE IF NO HEAD
-00403  0980                        ; @VTX X WHERE THE TAIL GOES, NEGATIVE IF NO TAIL
-00404  0980                        ; @VTC COUNT OF HOW MANY TAILS TO PAINT
-00405  0980  C9 00                 CMP            #0
-00406  0982  30 09                 BMI            @NOHEAD   ; LESS THAN 0, NO HEAD PAINTED
-00407  0984  C9 28                 CMP            #40
-00408  0986  10 05                 BPL            @NOHEAD   ; 40 OR MORE, NO HEAD (NO TAIL EITHER)
-00409  0988  85 FB                 STA            @VHX      ; HEAD IS AT X1
-00410  098A  4C 91 09              JMP            @CHECKTAIL
-00411  098D             @NOHEAD
-00412  098D  A9 FF                 LDA            #-1
-00413  098F  85 FB                 STA            @VHX
-00414  0991             @CHECKTAIL 
-00415  0991  BD C9 0B              LDA            OB_X1+OBJTABLE,X; THIS+1 TO THIS+DELTA IS TAIL
-00416  0994  C9 FF                 CMP            #-1
-00417  0996  30 1E                 BMI            @TAILLEFT
-00418  0998             ; X0 >= -1
-00419  0998  C9 27                 CMP            #39
-00420  099A  10 2A                 BPL            @NOTAIL
-00421  099C  18                    CLC
-00422  099D  69 01                 ADC            #1
-00423  099F  85 FA                 STA            @VTX      ; TAIL IS AT X1+1
-00424  09A1  A9 28                 LDA            #40
-00425  09A3  38                    SEC
-00426  09A4  E5 FA                 SBC            @VTX
-00427  09A6  C5 21                 CMP            DELTA
-00428  09A8  10 05                 BPL            @BIGGERDELTA
-00429  09AA  85 F9                 STA            @VTC
-00430  09AC  4C CA 09              JMP            @TAILDONE
-00431  09AF             @BIGGERDELTA 
-00432  09AF  A5 21                 LDA            DELTA
-00433  09B1  85 F9                 STA            @VTC
-00434  09B3  4C CA 09              JMP            @TAILDONE
-00435  09B6             ; X0 < -1
-00436  09B6             @TAILLEFT
-00437  09B6  18                    CLC
-00438  09B7  65 21                 ADC            DELTA     ; X0+DELTA
-00439  09B9                        ; 0 OR ABOVE, MEANS WE PAINT
-00440  09B9  30 0B                 BMI            @NOTAIL
-00441  09BB  69 01                 ADC            #1
-00442  09BD  85 F9                 STA            @VTC      ; HOW MANY TRAILING CHARS TO PAINT
-00443  09BF  A9 00                 LDA            #0
-00444  09C1  85 FA                 STA            @VTX      ; ALL GET PAINTED AT ZERO
-00445  09C3  4C CA 09              JMP            @TAILDONE
-00446  09C6             @NOTAIL
-00447  09C6  A9 FF                 LDA            #-1
-00448  09C8  85 FA                 STA            @VTX      ; NO TAIL PAINTS AT ALL
-00449  09CA             @TAILDONE
-00450  09CA             ; *******************************
-00451  09CA             ; ** PAINT LEFT SIDE
-00452  09CA             ; *******************************
-00453  09CA  A9 05                 LDA            #VIC_GREEN
-00454  09CC  8D 20 D0              STA            VIC_BORDERC
-00455  09CF                        ; PREPARE SCRNPTR
-00456  09CF  BD C8 0B              LDA            OB_Y+OBJTABLE,X; CURSCRNPTR = *(MULTABLE+O.Y*2)
-00457  09D2  0A                    ASL
-00458  09D3  AA                    TAX                      ; X = O.Y*2
-00459  09D4  BD 93 0B              LDA            MULTABLE,X
-00460  09D7  85 18                 STA            CURSCRNPTR
-00461  09D9  BD 94 0B              LDA            MULTABLE+1,X
-00462  09DC  85 19                 STA            CURSCRNPTR+1
-00463  09DE             ; -----------------
-00464  09DE             ; PAINT HEAD MACRO
-00465  09DE             ; -----------------
-00466  09DE             DEFM       PAINTOBJ
-00467  09DE                        LDY            @VHX
-00468  09DE                        BMI            @NOHEAD
-00469  09DE                        LDA            #/1
-00470  09DE                        STA            (CURSCRNPTR),Y
-00471  09DE             @NOHEAD
-00472  09DE                        LDY            @VTX
-00473  09DE                        BMI            @NOTAIL
-00474  09DE                        LDX            @VTC
-00475  09DE                        LDA            #/2
-00476  09DE             @MORETAIL
-00477  09DE                        STA            (CURSCRNPTR),Y
-00478  09DE                        INY
-00479  09DE                        DEX
-00480  09DE                        BNE            @MORETAIL
-00481  09DE             @NOTAIL
-00482  09DE                        ENDM
-00483  09DE             ; -----------------
-00484  09DE             PAINTTOP
-00485  09DE             
-00486  09DE             
-00487  09DE  A4 FB                 LDY            @VHX
-00488  09E0  30 04                 BMI            @NOHEAD
-00489  09E2  A9 55                 LDA            #O0_FU
-00490  09E4  91 18                 STA            (CURSCRNPTR),Y
-00491  09E6             @NOHEAD
-00492  09E6  A4 FA                 LDY            @VTX
-00493  09E8  30 0A                 BMI            @NOTAIL
-00494  09EA  A6 F9                 LDX            @VTC
-00495  09EC  A9 43                 LDA            #O0_MU
-00496  09EE             @MORETAIL
-00497  09EE  91 18                 STA            (CURSCRNPTR),Y
-00498  09F0  C8                    INY
-00499  09F1  CA                    DEX
-00500  09F2  D0 FA                 BNE            @MORETAIL
-00501  09F4             @NOTAIL
-00502  09F4             NEXTROW
-00503  09F4                        ; NEXT ROW JUST ADD 40 TO CURSCRNPTR
-00504  09F4  18                    CLC                      ; 2 NEED THIS AS USING INC LATER MIGHT LEAVE CARRY ON
-00505  09F5  A5 18                 LDA            CURSCRNPTR; 3 CURSCRNPTR += 40
-00506  09F7  69 28                 ADC            #40       ; 2
-00507  09F9  85 18                 STA            CURSCRNPTR; 3
-00508  09FB  90 02                 BCC            @NOCARRY  ; 2 NOT TAKEN (1 OUT OF 4), 3 TAKEN (3 OUT OF 4)
-00509  09FD  E6 19                 INC            CURSCRNPTR+1; 5 1/4 WE KNOW WE HAVE CARRY
-00510  09FF             @NOCARRY
-00511  09FF  18                    CLC
-00512  0A00                        ; CHECK IF WE NEED TO PAINT THE MIDDLE
-00513  0A00  C6 FE                 DEC            @VH
-00514  0A02  30 31                 BMI            PAINTEND  ; SUPPORT FOR 1 ROW OBSTACLES
-00515  0A04  F0 19                 BEQ            PAINTBOTTOM
-00516  0A06             @PAINTMIDDLE 
-00517  0A06             
-00518  0A06             
-00519  0A06  A4 FB                 LDY            @VHX
-00520  0A08  30 04                 BMI            @NOHEAD
-00521  0A0A  A9 42                 LDA            #O0_FM
-00522  0A0C  91 18                 STA            (CURSCRNPTR),Y
-00523  0A0E             @NOHEAD
-00524  0A0E  A4 FA                 LDY            @VTX
-00525  0A10  30 0A                 BMI            @NOTAIL
-00526  0A12  A6 F9                 LDX            @VTC
-00527  0A14  A9 66                 LDA            #O0_MM
-00528  0A16             @MORETAIL
-00529  0A16  91 18                 STA            (CURSCRNPTR),Y
-00530  0A18  C8                    INY
-00531  0A19  CA                    DEX
-00532  0A1A  D0 FA                 BNE            @MORETAIL
-00533  0A1C             @NOTAIL
-00534  0A1C  4C F4 09              JMP            NEXTROW
-00535  0A1F             PAINTBOTTOM 
-00536  0A1F             
-00537  0A1F             
-00538  0A1F  A4 FB                 LDY            @VHX
-00539  0A21  30 04                 BMI            @NOHEAD
-00540  0A23  A9 4A                 LDA            #O0_FB
-00541  0A25  91 18                 STA            (CURSCRNPTR),Y
-00542  0A27             @NOHEAD
-00543  0A27  A4 FA                 LDY            @VTX
-00544  0A29  30 0A                 BMI            @NOTAIL
-00545  0A2B  A6 F9                 LDX            @VTC
-00546  0A2D  A9 43                 LDA            #O0_MB
-00547  0A2F             @MORETAIL
-00548  0A2F  91 18                 STA            (CURSCRNPTR),Y
-00549  0A31  C8                    INY
-00550  0A32  CA                    DEX
-00551  0A33  D0 FA                 BNE            @MORETAIL
-00552  0A35             @NOTAIL
-00553  0A35             PAINTEND
-00554  0A35  A9 06                 LDA            #VIC_BLUE
-00555  0A37  8D 20 D0              STA            VIC_BORDERC
-00556  0A3A             ; *******************************
-00557  0A3A             ; ** CALC RIGHT SIDE
-00558  0A3A             ; *******************************
-00559  0A3A  A6 FF                 LDX            @CUROBJ
-00560  0A3C                        ; SET VH COUNTER
-00561  0A3C  BC C6 0B              LDY            OB_H+OBJTABLE,X
-00562  0A3F  88                    DEY
-00563  0A40  84 FE                 STY            @VH
-00564  0A42  BD C9 0B              LDA            OB_X1+OBJTABLE,X; LEFT END OF OBJECT
-00565  0A45  18                    CLC
-00566  0A46  6D C7 0B              ADC            OB_L+OBJTABLE; ADD LENGTH OF THE OBJECT
-00567  0A49  9D CA 0B              STA            OB_X2+OBJTABLE,X; STORE RIGHT END OF OBJECT
-00568  0A4C  C9 FC                 CMP            #-4
-00569  0A4E  10 03                 BPL            PAINTTHISRIGHT
-00570  0A50  4C 0A 0B              JMP            PAINTENDRIGHT
-00571  0A53             PAINTTHISRIGHT 
-00572  0A53                        ; REPEAT HEAD AND TAIL PAINT LOCATION CALCULATION WE DID
-00573  0A53                        ; FOR THE LEFT END OF OBJECT
-00574  0A53                        ; @VHX X WHERE THE HEAD GOES, NEGATIVE IF NO HEAD
-00575  0A53                        ; @VTX X WHERE THE TAIL GOES, NEGATIVE IF NO TAIL
-00576  0A53                        ; @VTC COUNT OF HOW MANY TAILS TO PAINT
-00577  0A53  C9 00                 CMP            #0
-00578  0A55  30 09                 BMI            @NOHEAD   ; LESS THAN 0, NO HEAD PAINTED
-00579  0A57  C9 28                 CMP            #40
-00580  0A59  10 05                 BPL            @NOHEAD   ; 40 OR MORE, NO HEAD (NO TAIL EITHER)
-00581  0A5B  85 FB                 STA            @VHX      ; HEAD IS AT X1
-00582  0A5D  4C 64 0A              JMP            @CHECKTAIL
-00583  0A60             @NOHEAD
-00584  0A60  A9 FF                 LDA            #-1
-00585  0A62  85 FB                 STA            @VHX
-00586  0A64             @CHECKTAIL 
-00587  0A64  BD CA 0B              LDA            OB_X2+OBJTABLE,X; THIS+1 TO THIS+DELTA IS TAIL
-00588  0A67  C9 FF                 CMP            #-1
-00589  0A69  30 1E                 BMI            @TAILLEFT
-00590  0A6B             ; X0 >= -1
-00591  0A6B  C9 27                 CMP            #39
-00592  0A6D  10 2A                 BPL            @NOTAIL
-00593  0A6F  18                    CLC
-00594  0A70  69 01                 ADC            #1
-00595  0A72  85 FA                 STA            @VTX      ; TAIL IS AT X1+1
-00596  0A74  A9 28                 LDA            #40
-00597  0A76  38                    SEC
-00598  0A77  E5 FA                 SBC            @VTX
-00599  0A79  C5 21                 CMP            DELTA
-00600  0A7B  10 05                 BPL            @BIGGERDELTA
-00601  0A7D  85 F9                 STA            @VTC
-00602  0A7F  4C 9D 0A              JMP            @TAILDONE
-00603  0A82             @BIGGERDELTA 
-00604  0A82  A5 21                 LDA            DELTA
-00605  0A84  85 F9                 STA            @VTC
-00606  0A86  4C 9D 0A              JMP            @TAILDONE
-00607  0A89             ; X0 < -1
-00608  0A89             @TAILLEFT
-00609  0A89  18                    CLC
-00610  0A8A  65 21                 ADC            DELTA     ; X0+DELTA
-00611  0A8C                        ; 0 OR ABOVE, MEANS WE PAINT
-00612  0A8C  30 0B                 BMI            @NOTAIL
-00613  0A8E  69 01                 ADC            #1
-00614  0A90  85 F9                 STA            @VTC      ; HOW MANY TRAILING CHARS TO PAINT
-00615  0A92  A9 00                 LDA            #0
-00616  0A94  85 FA                 STA            @VTX      ; ALL GET PAINTED AT ZERO
-00617  0A96  4C 9D 0A              JMP            @TAILDONE
-00618  0A99             @NOTAIL
-00619  0A99  A9 FF                 LDA            #-1
-00620  0A9B  85 FA                 STA            @VTX      ; NO TAIL PAINTS AT ALL
-00621  0A9D             @TAILDONE
-00622  0A9D             ; *******************************
-00623  0A9D             ; ** PAINT RIGHT SIDE
-00624  0A9D             ; *******************************
-00625  0A9D             
-00626  0A9D             
-00627  0A9D  48                    PHA
-00628  0A9E  A9 0D                 LDA            #VIC_LIGHTGREEN
-00629  0AA0  8D 20 D0              STA            VIC_BORDERC
-00630  0AA3  68                    PLA
-00631  0AA4                        ; PREPARE SCRNPTR
-00632  0AA4  BD C8 0B              LDA            OB_Y+OBJTABLE,X; CURSCRNPTR = *(MULTABLE+O.Y*2)
-00633  0AA7  0A                    ASL
-00634  0AA8  AA                    TAX                      ; X = O.Y*2
-00635  0AA9  BD 93 0B              LDA            MULTABLE,X
-00636  0AAC  85 18                 STA            CURSCRNPTR
-00637  0AAE  BD 94 0B              LDA            MULTABLE+1,X
-00638  0AB1  85 19                 STA            CURSCRNPTR+1
-00639  0AB3             PAINTTOPRIGHT 
-00640  0AB3             
-00641  0AB3             
-00642  0AB3  A4 FB                 LDY            @VHX
-00643  0AB5  30 04                 BMI            @NOHEAD
-00644  0AB7  A9 49                 LDA            #O0_BU
-00645  0AB9  91 18                 STA            (CURSCRNPTR),Y
-00646  0ABB             @NOHEAD
-00647  0ABB  A4 FA                 LDY            @VTX
-00648  0ABD  30 0A                 BMI            @NOTAIL
-00649  0ABF  A6 F9                 LDX            @VTC
-00650  0AC1  A9 24                 LDA            #STARCHAR
-00651  0AC3             @MORETAIL
-00652  0AC3  91 18                 STA            (CURSCRNPTR),Y
-00653  0AC5  C8                    INY
-00654  0AC6  CA                    DEX
-00655  0AC7  D0 FA                 BNE            @MORETAIL
-00656  0AC9             @NOTAIL
-00657  0AC9             NEXTROWRIGHT 
-00658  0AC9                        ; NEXT ROW JUST ADD 40 TO CURSCRNPTR
-00659  0AC9  18                    CLC
-00660  0ACA  A5 18                 LDA            CURSCRNPTR; CURSCRNPTR += 40
-00661  0ACC  69 28                 ADC            #40
-00662  0ACE  85 18                 STA            CURSCRNPTR
-00663  0AD0  90 02                 BCC            @NOCARRY
-00664  0AD2  E6 19                 INC            CURSCRNPTR+1
-00665  0AD4             @NOCARRY
-00666  0AD4  18                    CLC
-00667  0AD5                        ; CHECK IF WE NEED TO PAINT THE MIDDLE
-00668  0AD5  C6 FE                 DEC            @VH
-00669  0AD7  30 31                 BMI            PAINTENDRIGHT; SUPPORT FOR 1 ROW OBSTACLES
-00670  0AD9  F0 19                 BEQ            PAINTBOTTOMRIGHT
-00671  0ADB             @PAINTMIDDLE 
-00672  0ADB             
-00673  0ADB             
-00674  0ADB  A4 FB                 LDY            @VHX
-00675  0ADD  30 04                 BMI            @NOHEAD
-00676  0ADF  A9 48                 LDA            #O0_BM
-00677  0AE1  91 18                 STA            (CURSCRNPTR),Y
-00678  0AE3             @NOHEAD
-00679  0AE3  A4 FA                 LDY            @VTX
-00680  0AE5  30 0A                 BMI            @NOTAIL
-00681  0AE7  A6 F9                 LDX            @VTC
-00682  0AE9  A9 24                 LDA            #STARCHAR
-00683  0AEB             @MORETAIL
-00684  0AEB  91 18                 STA            (CURSCRNPTR),Y
-00685  0AED  C8                    INY
-00686  0AEE  CA                    DEX
-00687  0AEF  D0 FA                 BNE            @MORETAIL
-00688  0AF1             @NOTAIL
-00689  0AF1  4C C9 0A              JMP            NEXTROWRIGHT
-00690  0AF4             PAINTBOTTOMRIGHT 
-00691  0AF4             
-00692  0AF4             
-00693  0AF4  A4 FB                 LDY            @VHX
-00694  0AF6  30 04                 BMI            @NOHEAD
-00695  0AF8  A9 4B                 LDA            #O0_BB
-00696  0AFA  91 18                 STA            (CURSCRNPTR),Y
-00697  0AFC             @NOHEAD
-00698  0AFC  A4 FA                 LDY            @VTX
-00699  0AFE  30 0A                 BMI            @NOTAIL
-00700  0B00  A6 F9                 LDX            @VTC
-00701  0B02  A9 24                 LDA            #STARCHAR
-00702  0B04             @MORETAIL
-00703  0B04  91 18                 STA            (CURSCRNPTR),Y
-00704  0B06  C8                    INY
-00705  0B07  CA                    DEX
-00706  0B08  D0 FA                 BNE            @MORETAIL
-00707  0B0A             @NOTAIL
-00708  0B0A             PAINTENDRIGHT 
-00709  0B0A             ENDOBJ
-00710  0B0A  A6 FF                 LDX            @CUROBJ   ; RESTORE CUR OBJ POINTER IN X
-00711  0B0C                        ; GO THE NEXT OBJECT, PUT THE CURRENT OBJECT IN X AGAIN
-00712  0B0C             
-00713  0B0C             
-00714  0B0C  48                    PHA
-00715  0B0D  A9 00                 LDA            #VIC_BLACK
-00716  0B0F  8D 20 D0              STA            VIC_BORDERC
-00717  0B12  68                    PLA
-00718  0B13  4C F7 08              JMP            FOREVER
-00719  0B16             ; ****************************************
-00720  0B16             ; PAINTS 3 ROW WITH COLOR IN A
-00721  0B16             ; INPUT: CURCOLOR CURRENT COLOR POINTER
-00722  0B16             ; ****************************************
-00723  0B16             
-00724  0B16             TRIBAND
-00725  0B16  A0 00                 LDY     #0
-00726  0B18             @NEXTCOLOR 
-00727  0B18  91 14                 STA     (CURCOLOR_W),Y
-00728  0B1A  C8                    INY
-00729  0B1B  C0 78                 CPY     #120
-00730  0B1D  D0 F9                 BNE     @NEXTCOLOR
-00731  0B1F                        
-00732  0B1F             
-00733  0B1F             
-00734  0B1F  18                    CLC
-00735  0B20  A5 14                 LDA            CURCOLOR_W
-00736  0B22  69 78                 ADC            #<120
-00737  0B24  85 14                 STA            CURCOLOR_W
-00738  0B26  A5 15                 LDA            CURCOLOR_W+1
-00739  0B28  69 00                 ADC            #>120
-00740  0B2A  85 15                 STA            CURCOLOR_W+1
-00741  0B2C             
-00742  0B2C  60                    RTS
-00743  0B2D             
-00744  0B2D             ; **************************
-00745  0B2D             ; POINTERS TO EACH CHAR ROW
-00746  0B2D             ; DESTROYS ALL REGISTERS
-00747  0B2D             ; **************************
-00748  0B2D             INITMULTABLE 
-00749  0B2D  A9 00                 LDA     #<SCREEN
-00750  0B2F  85 16                 STA     CURPTR
-00751  0B31  A9 84                 LDA     #>SCREEN
-00752  0B33  85 17                 STA     CURPTR+1
-00753  0B35             
-00754  0B35  A2 00                 LDX     #0
-00755  0B37  A0 19                 LDY     #25
-00756  0B39             
-00757  0B39             @NEXT      
-00758  0B39  A5 16                 LDA     CURPTR          ; MULTABLE[X] = *CURPTR
-00759  0B3B  9D 93 0B              STA     MULTABLE,X
-00760  0B3E  E8                    INX
-00761  0B3F  A5 17                 LDA     CURPTR+1
-00762  0B41  9D 93 0B              STA     MULTABLE,X
-00763  0B44  E8                    INX
-00764  0B45  88                    DEY
-00765  0B46  F0 10                 BEQ     @DONE           ; IF (ALL ROWS DONE) EXIT
-00766  0B48                        
-00767  0B48  18                    CLC                    ; *CURPTR+=40
-00768  0B49  A5 16                 LDA     CURPTR
-00769  0B4B  69 28                 ADC     #40
-00770  0B4D  85 16                 STA     CURPTR
-00771  0B4F  A5 17                 LDA     CURPTR+1
-00772  0B51  69 00                 ADC     #0
-00773  0B53  85 17                 STA     CURPTR+1
-00774  0B55  4C 39 0B              JMP     @NEXT
-00775  0B58                        
-00776  0B58             @DONE
-00777  0B58  60                    RTS
-00778  0B59             
-00779  0B59             
-00780  0B59             ;*********************************************
-00781  0B59             ;* PRINTS HEX CONTENT OF REGISTER A ON SCREEN
-00782  0B59             ;*********************************************
-00783  0B59             PRINTA
-00784  0B59  85 12                 STA     ATEMP
-00785  0B5B  4A                    LSR
-00786  0B5C  4A                    LSR
-00787  0B5D  4A                    LSR
-00788  0B5E  4A                    LSR
-00789  0B5F  29 0F                 AND     #$0F
-00790  0B61  09 30                 ORA     #$30
-00791  0B63  C9 3A                 CMP     #$3A
-00792  0B65  30 03                 BMI     @OK1
-00793  0B67  38                    SEC
-00794  0B68  E9 39                 SBC     #$39
-00795  0B6A             @OK1
-00796  0B6A  8D 00 84              STA     SCREEN
-00797  0B6D  A5 12                 LDA     ATEMP
-00798  0B6F  29 0F                 AND     #$0F
-00799  0B71  09 30                 ORA     #$30
-00800  0B73  C9 3A                 CMP     #$3A
-00801  0B75  30 03                 BMI     @OK2
-00802  0B77  38                    SEC
-00803  0B78  E9 39                 SBC     #$39
-00804  0B7A             @OK2
-00805  0B7A  8D 01 84              STA     SCREEN+1
-00806  0B7D  A5 12                 LDA     ATEMP
-00807  0B7F  60                    RTS
-00808  0B80             INITLEVEL
-00809  0B80  A9 01                 LDA            #1
-00810  0B82  85 21                 STA            DELTA     ; SCROLL BY 1 FOR NOW
-00811  0B84                        
-00812  0B84             ; RESET STAGE X POSITION
-00813  0B84  A9 00                 LDA            #0
-00814  0B86  85 22                 STA            STAGEX_W   ; RESET STAGE X POSITION
-00815  0B88  85 23                 STA            STAGEX_W+1
-00816  0B8A                        
-00817  0B8A             ; INITIALIZE LEVEL POINTER
-00818  0B8A  A9 8D                 LDA            #<LEVEL
-00819  0B8C  85 24                 STA            LEVELPTR_W
-00820  0B8E  A9 0C                 LDA            #>LEVEL
-00821  0B90  85 24                 STA            LEVELPTR_W
-00822  0B92                        
-00823  0B92             
-00824  0B92  60                    RTS
-00825  0B93             MULTABLE
-00826  0B93  00 00 00              DCW            25,0
-00827  0BC5             ;*****************************
-00828  0BC5             ; OBSTACLES ON SCREEN
-00829  0BC5             ; OBJECTS ARE OB_SIZE BYTES
-00830  0BC5             ;*****************************
-00831  0BC5             OBJTABLE
-00832  0BC5                        ; TYPE, HEIGHT, WIDTH, Y,, X1, X2
-00833  0BC5  00 00 00              DCB            200,0; SPACE FOR ENOUGH OBJECTS
-00834  0C8D             LEVEL
-00835  0C8D  01 04 1E              BYTE           1,4,30, 3 ; TYPE, HEIGHT, WIDTH, Y
-00836  0C91  0A 00                 WORD           10        ; POSITION WITHIN BLOCK
-00837  0C93  01 04 1E              BYTE           1,4,30, 15
-00838  0C97  1E 00                 WORD           30
-00839  0C99  01 04 1E              BYTE           1,4,30, 20
-00840  0C9D  3C 00                 WORD           60
-00841  0C9F  01 04 1E              BYTE           1,4,30, 20
-00842  0CA3  78 00                 WORD           120
-00843  0CA5             
+00026  0001             ; REGISTERS
+00027  0001             
+00028  0001             ; SPRITES
+00029  0001             VIC_SP0_X  = $D000
+00030  0001             VIC_SP0_Y  = $D001
+00031  0001             VIC_SP1_X  = $D002
+00032  0001             VIC_SP1_Y  = $D003
+00033  0001             VIC_SP2_X  = $D004
+00034  0001             VIC_SP2_Y  = $D005
+00035  0001             VIC_SP3_X  = $D006
+00036  0001             VIC_SP3_Y  = $D007
+00037  0001             VIC_SP4_X  = $D008
+00038  0001             VIC_SP4_Y  = $D009
+00039  0001             VIC_SP5_X  = $D00A
+00040  0001             VIC_SP5_Y  = $D00B
+00041  0001             VIC_SP6_X  = $D00C
+00042  0001             VIC_SP6_Y  = $D00D
+00043  0001             VIC_SP7_X  = $D00E
+00044  0001             VIC_SP7_Y  = $D00F
+00045  0001             VIC_SPX    = $D010
+00046  0001             
+00047  0001             ; COLORS
+00048  0001             VIC_BORDERC = $D020
+00049  0001             VIC_BG0C   = $D021
+00050  0001             VIC_BG1C   = $D022
+00051  0001             VIC_BG2C   = $D023
+00052  0001             VIC_BG3C   = $D024
+00053  0001             VIC_SP0MC  = $D025
+00054  0001             VIC_SP1MC  = $D026
+00055  0001             VIC_SP0C   = $D027
+00056  0001             VIC_SP1C   = $D028
+00057  0001             VIC_SP2C   = $D029
+00058  0001             VIC_SP3C   = $D02A
+00059  0001             VIC_SP4C   = $D02B
+00060  0001             VIC_SP5C   = $D02C
+00061  0001             VIC_SP6C   = $D02D
+00062  0001             VIC_SP7C   = $D02E
+00063  0001             
+00064  0001             
+00065  0001             ; CONTROL
+00066  0001             VIC_MEM    = $D018
+00067  0001             VIC_RASTER = $D012
+00068  0001             
+00069  0001             ; CIAB
+00070  0001             CIAB_PRA   = $DD00
+00071  0001             ; ******************************************************
+00072  0001             ; COLORS BACKGROUND TO MEASURE PERFORMANCE
+00073  0001             ;
+00074  0001             ; EX:
+00075  0001             ; PERFMARK VIC_YELLOW
+00076  0001             ; ******************************************************
+00077  0001             
+00078  0001             DEFM       PERFMARK
+00079  0001                        PHA
+00080  0001                        LDA            #/1
+00081  0001                        STA            VIC_BORDERC
+00082  0001                        PLA
+00083  0001                        ENDM
+00084  0001             
+00085  0001             ; ******************************************************
+00086  0001             ; ADDS CONSTANT TO CONTENTS OF IMMEDIATE MEMORY ADDRESS
+00087  0001             ;
+00088  0001             ; EX:
+00089  0001             ; ADDAW 33, SCREENPTR
+00090  0001             ; ******************************************************
+00091  0001             
+00092  0001             DEFM       ADDAW
+00093  0001                        CLC
+00094  0001                        LDA            /2
+00095  0001                        ADC            #</1
+00096  0001                        STA            /2
+00097  0001                        LDA            /2+1
+00098  0001                        ADC            #>/1
+00099  0001                        STA            /2+1
+00100  0001                        ENDM
+00101  0001             
+00102  0001             ; ******************************************************
+00103  0001             ; MOVES CONSTANT TO CONTENTS OF IMMEDIATE MEMORY ADDRESS
+00104  0001             ;
+00105  0001             ; EX:
+00106  0001             ; MOVEW 0, SCREENPTR
+00107  0001             ; ******************************************************
+00108  0001             
+00109  0001             DEFM       MOVEW
+00110  0001                        LDA            #</1
+00111  0001                        STA            /2
+00112  0001                        LDA            #>/1
+00113  0001                        STA            /2+1
+00114  0001                        ENDM
+00115  0001             
+00116  0001                        
+00117  0001             
+00118  0001                        
+00119  0001             
+00120  0001             ; BASIC HEADER
+00121  0001             *=$0801
+00122  0801  0E 08 0A              BYTE           $0E, $08, $0A, $00, $9E, $20, $28,  $32, $30, $39, $36, $29, $00, $00, $00
+00123  0810             *=$830
+00124  0830             
+00125  0830             
+00126  0830             ; *********************
+00127  0830             ; SCREEN LOCATION
+00128  0830             ; *********************
+00129  0830             
+00130  0830             SCREEN     = $8400
+00131  0830             CHARS      = $B000
+00132  0830             CHARSETEND = $BFFF
+00133  0830             ; STARSCROLLER
+00134  0830             STARCHAR   = 36
+00135  0830             STAR_CHARS0 = CHARS+288
+00136  0830             STAR_CHARS1 = CHARS+296
+00137  0830             
+00138  0830             ; $0-$FF ZERO PAGE
+00139  0830             ; $100-$1FF STACK
+00140  0830             ; $200-$7FFF RAM
+00141  0830             ; $8000-$BFFF VIC
+00142  0830             ; $C000-$FFFF RAM
+00143  0830             
+00144  0830             ; *********************
+00145  0830             ; CONSTANTS
+00146  0830             ; *********************
+00147  0830             
+00148  0830                        
+00149  0830             
+00150  0830             ; ***************************
+00151  0830             ; ZERO PAGE GLOBAL VARIABLES
+00152  0830             ; ***************************
+00153  0830             SCRPTR_W   = $10                    ; FOR CHARACTER FILLING
+00154  0830             ATEMP      = $12                    ; STORE A SOMETIMES
+00155  0830             FRAMECT    = $13
+00156  0830             CURCOLOR_W= $14                    ; WORD
+00157  0830             CURPTR     = $16                    ; GENERIC POINTER
+00158  0830             CURSCRNPTR = $18                    ; GENERIC SCREEN POINTER
+00159  0830             UNUSED0    = $20
+00160  0830             DELTA      = $21                    ; DELTA CHARACTERS FOR SCREEN SCROLL
+00161  0830             STAGEX_W   = $22                    ; CURRENT POSITION OF THE STAGE
+00162  0830             LEVELPTR_W= $24                    ; POINTER TO THE CURRENTLY EVALUATED OBJECT IN THE LEVEL
+00163  0830                        
+00164  0830             START
+00165  0830  20 59 09              JSR            INITLEVEL
+00166  0833                        
+00167  0833             @AGAIN
+00168  0833                        ;JSR            ACTIVATEOBJECTS
+00169  0833  4C 33 08              JMP            @AGAIN
+00170  0836                        
+00171  0836                        
+00172  0836                        ; DISABLE CIA INTERRUPT (IS THIS ON BY DEFAULT FOR BASIC?)
+00173  0836                        ; THIS IS IMPORTANT OR THE COPY CHAR ROUTINE WILL CRASH FOR SOME REASON
+00174  0836  AD 0E DC              LDA            $DC0E
+00175  0839  29 FE                 AND            #$FE
+00176  083B  8D 0E DC              STA            $DC0E
+00177  083E                        ; DISABLE ALL CPU INTERRUPT
+00178  083E  78                    SEI
+00179  083F  20 A4 09              JSR            INITMULTABLE
+00180  0842                        ; DEBUG HERE
+00181  0842                        ; END DEBUG
+00182  0842  A5 01                 LDA            $1
+00183  0844  29 FB                 AND            #$FB
+00184  0846  85 01                 STA            $1        ; CHAR ROM VISIBLE AT $D000
+00185  0848             ; **********
+00186  0848             ; COPY CHARS
+00187  0848             ; **********
+00188  0848                        ; HTTPS://WWW.PAGETABLE.COM/C64REF/C64DISASM/
+00189  0848  A9 00                 LDA            #$0
+00190  084A  A0 D0                 LDY            #$D0
+00191  084C  85 5F                 STA            95
+00192  084E  84 60                 STY            96
+00193  0850  A9 FF                 LDA            #$FF
+00194  0852  A0 DF                 LDY            #$DF
+00195  0854  85 5A                 STA            90
+00196  0856  84 5B                 STY            91
+00197  0858  A9 FF                 LDA            #<CHARSETEND; MUST KEEP THESE VALUES IN A AND Y
+00198  085A  A0 BF                 LDY            #>CHARSETEND
+00199  085C  85 58                 STA            88
+00200  085E  84 59                 STY            89
+00201  0860  20 BF A3              JSR            $A3BF     ; BLOCK COPY
+00202  0863                        
+00203  0863  A5 01                 LDA            $1
+00204  0865  29 F8                 AND            #$F8
+00205  0867  09 05                 ORA            #$05      ; ALL RAM, EXCEPT FOR I/O
+00206  0869  85 01                 STA            $1
+00207  086B                        ; VIC II ON BANK 2 ($8000-$BFFF)
+00208  086B  AD 00 DD              LDA            CIAB_PRA
+00209  086E  29 FC                 AND            #$FC
+00210  0870  09 01                 ORA            #$1
+00211  0872  8D 00 DD              STA            CIAB_PRA
+00212  0875                        ; SELECT VIC CHARACTER BANK TO $3000
+00213  0875  AD 18 D0              LDA            VIC_MEM   ; DEFAULT $15
+00214  0878  29 F0                 AND            #$F0
+00215  087A  09 0C                 ORA            #$0C
+00216  087C  8D 18 D0              STA            VIC_MEM   ; $1C
+00217  087F             ; ******************************************
+00218  087F             ; FILL BACKGROUND WITH ALTERNATING BC CHARACTERS
+00219  087F             ; ******************************************
+00220  087F             
+00221  087F             
+00222  087F  A9 00                 LDA            #<SCREEN
+00223  0881  85 10                 STA            SCRPTR_W
+00224  0883  A9 84                 LDA            #>SCREEN
+00225  0885  85 11                 STA            SCRPTR_W+1
+00226  0887  A2 19                 LDX            #25       ; 25 LINES
+00227  0889  A9 24                 LDA            #STARCHAR ; FIRST OF TWO ALTERNATING CHARS
+00228  088B             @ROWLOOP
+00229  088B  A0 27                 LDY            #39
+00230  088D             @LOOP
+00231  088D  91 10                 STA            (SCRPTR_W),Y
+00232  088F  49 01                 EOR            #$1       ; OTHER CHARACTER
+00233  0891  88                    DEY
+00234  0892  10 F9                 BPL            @LOOP
+00235  0894  49 01                 EOR            #$1
+00236  0896  85 12                 STA            ATEMP
+00237  0898             
+00238  0898             
+00239  0898  18                    CLC
+00240  0899  A5 10                 LDA            SCRPTR_W
+00241  089B  69 28                 ADC            #<40
+00242  089D  85 10                 STA            SCRPTR_W
+00243  089F  A5 11                 LDA            SCRPTR_W+1
+00244  08A1  69 00                 ADC            #>40
+00245  08A3  85 11                 STA            SCRPTR_W+1
+00246  08A5  A5 12                 LDA            ATEMP
+00247  08A7  CA                    DEX
+00248  08A8  D0 E1                 BNE            @ROWLOOP
+00249  08AA             ; ***********************
+00250  08AA             ; SETUP CHARACTER COLORS
+00251  08AA             ; ***********************
+00252  08AA  A9 00                 LDA            #$0
+00253  08AC  8D 20 D0              STA            $D020     ; BORDER
+00254  08AF  8D 21 D0              STA            $D021     ; BACKGROUND
+00255  08B2  A9 00                 LDA            #<VIC_COLOR
+00256  08B4  85 14                 STA            CURCOLOR_W
+00257  08B6  A9 D8                 LDA            #>VIC_COLOR
+00258  08B8  85 15                 STA            CURCOLOR_W+1
+00259  08BA  A9 06                 LDA            #VIC_BLUE
+00260  08BC  20 8D 09              JSR            TRIBAND
+00261  08BF  A9 0E                 LDA            #VIC_LIGHTBLUE
+00262  08C1  20 8D 09              JSR            TRIBAND
+00263  08C4  A9 07                 LDA            #VIC_YELLOW
+00264  08C6  20 8D 09              JSR            TRIBAND
+00265  08C9  A9 01                 LDA            #VIC_WHITE
+00266  08CB  20 8D 09              JSR            TRIBAND
+00267  08CE  A9 01                 LDA            #VIC_WHITE
+00268  08D0  20 8D 09              JSR            TRIBAND
+00269  08D3  A9 07                 LDA            #VIC_YELLOW
+00270  08D5  20 8D 09              JSR            TRIBAND
+00271  08D8  A9 0A                 LDA            #VIC_LIGHTRED
+00272  08DA  20 8D 09              JSR            TRIBAND
+00273  08DD  A9 02                 LDA            #VIC_RED
+00274  08DF  20 8D 09              JSR            TRIBAND
+00275  08E2             ; ********************
+00276  08E2             ; PREP STAR CHARACTERS
+00277  08E2             ; ********************
+00278  08E2                        ; STARS ARE ON LINE 3
+00279  08E2                        ; AND ON LINE 7
+00280  08E2  A9 00                 LDA            #$0
+00281  08E4  A2 0F                 LDX            #15
+00282  08E6             @NULCHAR
+00283  08E6  9D 20 B1              STA            STAR_CHARS0,X
+00284  08E9  CA                    DEX
+00285  08EA  10 FA                 BPL            @NULCHAR
+00286  08EC  A9 10                 LDA            #$10
+00287  08EE  8D 23 B1              STA            STAR_CHARS0+3
+00288  08F1  A9 02                 LDA            #$02
+00289  08F3  8D 2F B1              STA            STAR_CHARS1+7
+00290  08F6             ; *********
+00291  08F6             ; MAIN LOOP
+00292  08F6             ; *********
+00293  08F6  A9 00                 LDA            #$00
+00294  08F8  85 13                 STA            FRAMECT
+00295  08FA             FOREVER
+00296  08FA  A9 FF                 LDA            #$FF
+00297  08FC             WAIT
+00298  08FC  CD 12 D0              CMP            VIC_RASTER
+00299  08FF  D0 FB                 BNE            WAIT
+00300  0901  A9 02                 LDA            #VIC_RED
+00301  0903  8D 20 D0              STA            VIC_BORDERC
+00302  0906             ;**********************
+00303  0906             ; BACKGROUND SCROLLING
+00304  0906             ;**********************
+00305  0906                        ; SCROLL FAST STAR
+00306  0906  18                    CLC
+00307  0907  AD 2B B1              LDA            STAR_CHARS1+3
+00308  090A  2A                    ROL
+00309  090B  8D 2B B1              STA            STAR_CHARS1+3
+00310  090E  AD 23 B1              LDA            STAR_CHARS0+3
+00311  0911  2A                    ROL
+00312  0912  8D 23 B1              STA            STAR_CHARS0+3
+00313  0915  90 08                 BCC            @NOL
+00314  0917  AD 2B B1              LDA            STAR_CHARS1+3
+00315  091A  09 01                 ORA            #$01
+00316  091C  8D 2B B1              STA            STAR_CHARS1+3
+00317  091F             @NOL
+00318  091F                        ; CHECK IF SCROLL SLOW STAR
+00319  091F  A6 13                 LDX            FRAMECT
+00320  0921  E8                    INX
+00321  0922  86 13                 STX            FRAMECT
+00322  0924  8A                    TXA
+00323  0925  29 01                 AND            #$01
+00324  0927  D0 19                 BNE            @NOS
+00325  0929                        ; SCROLL LOW STAR
+00326  0929  18                    CLC
+00327  092A  AD 2F B1              LDA            STAR_CHARS1+7
+00328  092D  2A                    ROL
+00329  092E  8D 2F B1              STA            STAR_CHARS1+7
+00330  0931  AD 27 B1              LDA            STAR_CHARS0+7
+00331  0934  2A                    ROL
+00332  0935  8D 27 B1              STA            STAR_CHARS0+7
+00333  0938  90 08                 BCC            @NOR
+00334  093A  AD 2F B1              LDA            STAR_CHARS1+7
+00335  093D  09 01                 ORA            #$01
+00336  093F  8D 2F B1              STA            STAR_CHARS1+7
+00337  0942             @NOR
+00338  0942             @NOS
+00339  0942             
+00340  0942             
+00341  0942             ;*********************************
+00342  0942             ;** ACTIVATES OBJECTS
+00343  0942             ;*********************************
+00344  0942             
+00345  0942             
+00346  0942             
+00347  0942  48                    PHA
+00348  0943  A9 0A                 LDA            #VIC_LIGHTRED
+00349  0945  8D 20 D0              STA            VIC_BORDERC
+00350  0948  68                    PLA
+00351  0949                        
+00352  0949  20 B1 0B              JSR ACTIVATEOBJECTS
+00353  094C  20 F7 09              JSR PAINTOBJECTS
+00354  094F             
+00355  094F             
+00356  094F             
+00357  094F             
+00358  094F  48                    PHA
+00359  0950  A9 00                 LDA            #VIC_BLACK
+00360  0952  8D 20 D0              STA            VIC_BORDERC
+00361  0955  68                    PLA
+00362  0956  4C FA 08              JMP            FOREVER
+00363  0959                        
+00364  0959             
+00365  0959                        
+00366  0959             INITLEVEL
+00367  0959  A9 01                 LDA            #1
+00368  095B  85 21                 STA            DELTA     ; SCROLL BY 1 FOR NOW
+00369  095D                        
+00370  095D             ; RESET STAGE X POSITION
+00371  095D  A9 00                 LDA            #0
+00372  095F  85 22                 STA            STAGEX_W   ; RESET STAGE X POSITION
+00373  0961  85 23                 STA            STAGEX_W+1
+00374  0963                        
+00375  0963             ; INITIALIZE LEVEL POINTER
+00376  0963  A9 3E                 LDA            #<LEVEL
+00377  0965  85 24                 STA            LEVELPTR_W
+00378  0967  A9 0C                 LDA            #>LEVEL
+00379  0969  85 25                 STA            LEVELPTR_W+1
+00380  096B                        
+00381  096B             ; CLEAR OBJECT MEMORY
+00382  096B  A0 09                 LDY            #MAX_OBJECTS-1
+00383  096D  A2 00                 LDX            #0
+00384  096F  A9 00                 LDA            #0
+00385  0971             @CLEARNEXT 
+00386  0971  9D 00 C0              STA            OBJTABLE,X
+00387  0974  E8                    INX
+00388  0975  9D 00 C0              STA            OBJTABLE,X
+00389  0978  E8                    INX
+00390  0979  9D 00 C0              STA            OBJTABLE,X
+00391  097C  E8                    INX
+00392  097D  9D 00 C0              STA            OBJTABLE,X
+00393  0980  E8                    INX
+00394  0981  9D 00 C0              STA            OBJTABLE,X
+00395  0984  E8                    INX
+00396  0985  9D 00 C0              STA            OBJTABLE,X
+00397  0988  E8                    INX
+00398  0989  88                    DEY
+00399  098A  10 E5                 BPL            @CLEARNEXT
+00400  098C                        
+00401  098C  60                    RTS
+00402  098D                        
+00403  098D             ; *******************************
+00404  098D             ; * INCLUDE ASSEMBLY ROUTINES
+00405  098D             ; *******************************
+00406  098D             
+00407  098D             ; ****************************************
+00408  098D             ; PAINTS 3 ROW WITH COLOR IN A
+00409  098D             ; INPUT: CURCOLOR CURRENT COLOR POINTER
+00410  098D             ; ****************************************
+00411  098D             
+00412  098D             TRIBAND
+00413  098D  A0 00                 LDY     #0
+00414  098F             @NEXTCOLOR 
+00415  098F  91 14                 STA     (CURCOLOR_W),Y
+00416  0991  C8                    INY
+00417  0992  C0 78                 CPY     #120
+00418  0994  D0 F9                 BNE     @NEXTCOLOR
+00419  0996                        
+00420  0996             
+00421  0996             
+00422  0996  18                    CLC
+00423  0997  A5 14                 LDA            CURCOLOR_W
+00424  0999  69 78                 ADC            #<120
+00425  099B  85 14                 STA            CURCOLOR_W
+00426  099D  A5 15                 LDA            CURCOLOR_W+1
+00427  099F  69 00                 ADC            #>120
+00428  09A1  85 15                 STA            CURCOLOR_W+1
+00429  09A3             
+00430  09A3  60                    RTS
+00431  09A4             
+00432  09A4             ; **************************
+00433  09A4             ; POINTERS TO EACH CHAR ROW
+00434  09A4             ; DESTROYS ALL REGISTERS
+00435  09A4             ; **************************
+00436  09A4             INITMULTABLE 
+00437  09A4  A9 00                 LDA     #<SCREEN
+00438  09A6  85 16                 STA     CURPTR
+00439  09A8  A9 84                 LDA     #>SCREEN
+00440  09AA  85 17                 STA     CURPTR+1
+00441  09AC             
+00442  09AC  A2 00                 LDX     #0
+00443  09AE  A0 19                 LDY     #25
+00444  09B0             
+00445  09B0             @NEXT      
+00446  09B0  A5 16                 LDA     CURPTR          ; MULTABLE[X] = *CURPTR
+00447  09B2  9D 0C 0C              STA     MULTABLE,X
+00448  09B5  E8                    INX
+00449  09B6  A5 17                 LDA     CURPTR+1
+00450  09B8  9D 0C 0C              STA     MULTABLE,X
+00451  09BB  E8                    INX
+00452  09BC  88                    DEY
+00453  09BD  F0 10                 BEQ     @DONE           ; IF (ALL ROWS DONE) EXIT
+00454  09BF                        
+00455  09BF  18                    CLC                    ; *CURPTR+=40
+00456  09C0  A5 16                 LDA     CURPTR
+00457  09C2  69 28                 ADC     #40
+00458  09C4  85 16                 STA     CURPTR
+00459  09C6  A5 17                 LDA     CURPTR+1
+00460  09C8  69 00                 ADC     #0
+00461  09CA  85 17                 STA     CURPTR+1
+00462  09CC  4C B0 09              JMP     @NEXT
+00463  09CF                        
+00464  09CF             @DONE
+00465  09CF  60                    RTS
+00466  09D0             
+00467  09D0             
+00468  09D0             ;*********************************************
+00469  09D0             ;* PRINTS HEX CONTENT OF REGISTER A ON SCREEN
+00470  09D0             ;*********************************************
+00471  09D0             PRINTA
+00472  09D0  85 12                 STA     ATEMP
+00473  09D2  4A                    LSR
+00474  09D3  4A                    LSR
+00475  09D4  4A                    LSR
+00476  09D5  4A                    LSR
+00477  09D6  29 0F                 AND     #$0F
+00478  09D8  09 30                 ORA     #$30
+00479  09DA  C9 3A                 CMP     #$3A
+00480  09DC  30 03                 BMI     @OK1
+00481  09DE  38                    SEC
+00482  09DF  E9 39                 SBC     #$39
+00483  09E1             @OK1
+00484  09E1  8D 00 84              STA     SCREEN
+00485  09E4  A5 12                 LDA     ATEMP
+00486  09E6  29 0F                 AND     #$0F
+00487  09E8  09 30                 ORA     #$30
+00488  09EA  C9 3A                 CMP     #$3A
+00489  09EC  30 03                 BMI     @OK2
+00490  09EE  38                    SEC
+00491  09EF  E9 39                 SBC     #$39
+00492  09F1             @OK2
+00493  09F1  8D 01 84              STA     SCREEN+1
+00494  09F4  A5 12                 LDA     ATEMP
+00495  09F6  60                    RTS
+00496  09F7             ; -----------------
+00497  09F7             ; PAINT HEAD MACRO
+00498  09F7             ; -----------------
+00499  09F7             DEFM       PAINTOBJ
+00500  09F7                        LDY            @VHX
+00501  09F7                        BMI            @NOHEAD
+00502  09F7                        LDA            #/1
+00503  09F7                        STA            (CURSCRNPTR),Y
+00504  09F7             @NOHEAD
+00505  09F7                        LDY            @VTX
+00506  09F7                        BMI            @NOTAIL
+00507  09F7                        LDX            @VTC
+00508  09F7                        LDA            #/2
+00509  09F7             @MORETAIL
+00510  09F7                        STA            (CURSCRNPTR),Y
+00511  09F7                        INY
+00512  09F7                        DEX
+00513  09F7                        BNE            @MORETAIL
+00514  09F7             @NOTAIL
+00515  09F7                        ENDM
+00516  09F7             
+00517  09F7             
+00518  09F7                        
+00519  09F7             
+00520  09F7             ; ******************
+00521  09F7             ; SCROLL FRONT MACRO
+00522  09F7             ; ******************
+00523  09F7                        ; CHARACTERS USED FOR SCROLLING
+00524  09F7             O0_FU      = 85                     ; FRONT UP
+00525  09F7             O0_FM      = 66                     ; FRONT MIDDLE
+00526  09F7             O0_FB      = 74                     ; FRONT BOTTOM
+00527  09F7             O0_MU      = 67                     ; MIDDLE UP
+00528  09F7             O0_MM      = 102                    ; MIDDLE MIDDLE
+00529  09F7             O0_MB      = 67                     ; MIDDLE BOTTOM
+00530  09F7             O0_BU      = 73                     ; BACK UP
+00531  09F7             O0_BM      = 72                     ; BACK MIDDLE
+00532  09F7             O0_BB      = 75                     ; BACK BOTTOM
+00533  09F7             OBJECTGEN
+00534  09F7             ; VARIABLES
+00535  09F7             @CUROBJ    = $FF                    ; CURRENT OBJECT OFFSET, BYTE
+00536  09F7             @VH        = $FE                    ; JUST A VARIABLE
+00537  09F7             @UNUSED    = $FD                    ;
+00538  09F7             @HFLAG     = $FC                    ; PAINT HEAD ?
+00539  09F7             @VHX       = $FB                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
+00540  09F7             @VTX       = $FA                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
+00541  09F7             @VTC       = $F9                    ; CURRENT OBJECT X (WHERE LEFT/RIGHT IS)
+00542  09F7             
+00543  09F7             PAINTOBJECTS 
+00544  09F7             
+00545  09F7             
+00546  09F7  48                    PHA
+00547  09F8  A9 06                 LDA            #VIC_BLUE
+00548  09FA  8D 20 D0              STA            VIC_BORDERC
+00549  09FD  68                    PLA
+00550  09FE                        
+00551  09FE                        
+00552  09FE  A9 04                 LDA            #4        ; SCROLL 0-4
+00553  0A00  85 21                 STA            DELTA     ; JUST FIXED SCROLLING BY 2
+00554  0A02                        ; OBJECT PTR
+00555  0A02  A2 00                 LDX            #0
+00556  0A04  86 FF                 STX            @CUROBJ
+00557  0A06  BD 00 C0              LDA            OB_TYPE+OBJTABLE,X; TEST IF OBJECT IS LIVE
+00558  0A09  D0 03                 BNE            @DOTHISOBJECT
+00559  0A0B  4C AE 0B              JMP            ENDOBJ
+00560  0A0E             @DOTHISOBJECT 
+00561  0A0E                        ; SET VH COUNTER
+00562  0A0E  BC 01 C0              LDY            OB_H+OBJTABLE,X
+00563  0A11  88                    DEY
+00564  0A12  84 FE                 STY            @VH
+00565  0A14                        ; MOVE OBJECT LEFT
+00566  0A14  BD 04 C0              LDA            OB_X1+OBJTABLE,X
+00567  0A17  38                    SEC
+00568  0A18  E5 21                 SBC            DELTA
+00569  0A1A  9D 04 C0              STA            OB_X1+OBJTABLE,X
+00570  0A1D             ; *******************************
+00571  0A1D             ; ** LEFT SIDE
+00572  0A1D             ; *******************************
+00573  0A1D                        ; IF X1 IS MORE THAN 4 OUTSIDE, THERE IS NOTHING TO PAINT HERE
+00574  0A1D  C9 FC                 CMP            #-4
+00575  0A1F  10 03                 BPL            PAINTTHIS
+00576  0A21  4C D9 0A              JMP            PAINTEND
+00577  0A24             PAINTTHIS
+00578  0A24                        ; @VHX X WHERE THE HEAD GOES, NEGATIVE IF NO HEAD
+00579  0A24                        ; @VTX X WHERE THE TAIL GOES, NEGATIVE IF NO TAIL
+00580  0A24                        ; @VTC COUNT OF HOW MANY TAILS TO PAINT
+00581  0A24  C9 00                 CMP            #0
+00582  0A26  30 09                 BMI            @NOHEAD   ; LESS THAN 0, NO HEAD PAINTED
+00583  0A28  C9 28                 CMP            #40
+00584  0A2A  10 05                 BPL            @NOHEAD   ; 40 OR MORE, NO HEAD (NO TAIL EITHER)
+00585  0A2C  85 FB                 STA            @VHX      ; HEAD IS AT X1
+00586  0A2E  4C 35 0A              JMP            @CHECKTAIL
+00587  0A31             @NOHEAD
+00588  0A31  A9 FF                 LDA            #-1
+00589  0A33  85 FB                 STA            @VHX
+00590  0A35             @CHECKTAIL 
+00591  0A35  BD 04 C0              LDA            OB_X1+OBJTABLE,X; THIS+1 TO THIS+DELTA IS TAIL
+00592  0A38  C9 FF                 CMP            #-1
+00593  0A3A  30 1E                 BMI            @TAILLEFT
+00594  0A3C             ; X0 >= -1
+00595  0A3C  C9 27                 CMP            #39
+00596  0A3E  10 2A                 BPL            @NOTAIL
+00597  0A40  18                    CLC
+00598  0A41  69 01                 ADC            #1
+00599  0A43  85 FA                 STA            @VTX      ; TAIL IS AT X1+1
+00600  0A45  A9 28                 LDA            #40
+00601  0A47  38                    SEC
+00602  0A48  E5 FA                 SBC            @VTX
+00603  0A4A  C5 21                 CMP            DELTA
+00604  0A4C  10 05                 BPL            @BIGGERDELTA
+00605  0A4E  85 F9                 STA            @VTC
+00606  0A50  4C 6E 0A              JMP            @TAILDONE
+00607  0A53             @BIGGERDELTA 
+00608  0A53  A5 21                 LDA            DELTA
+00609  0A55  85 F9                 STA            @VTC
+00610  0A57  4C 6E 0A              JMP            @TAILDONE
+00611  0A5A             ; X0 < -1
+00612  0A5A             @TAILLEFT
+00613  0A5A  18                    CLC
+00614  0A5B  65 21                 ADC            DELTA     ; X0+DELTA
+00615  0A5D                        ; 0 OR ABOVE, MEANS WE PAINT
+00616  0A5D  30 0B                 BMI            @NOTAIL
+00617  0A5F  69 01                 ADC            #1
+00618  0A61  85 F9                 STA            @VTC      ; HOW MANY TRAILING CHARS TO PAINT
+00619  0A63  A9 00                 LDA            #0
+00620  0A65  85 FA                 STA            @VTX      ; ALL GET PAINTED AT ZERO
+00621  0A67  4C 6E 0A              JMP            @TAILDONE
+00622  0A6A             @NOTAIL
+00623  0A6A  A9 FF                 LDA            #-1
+00624  0A6C  85 FA                 STA            @VTX      ; NO TAIL PAINTS AT ALL
+00625  0A6E             @TAILDONE
+00626  0A6E             ; *******************************
+00627  0A6E             ; ** PAINT LEFT SIDE
+00628  0A6E             ; *******************************
+00629  0A6E  A9 05                 LDA            #VIC_GREEN
+00630  0A70  8D 20 D0              STA            VIC_BORDERC
+00631  0A73                        ; PREPARE SCRNPTR
+00632  0A73  BD 03 C0              LDA            OB_Y+OBJTABLE,X; CURSCRNPTR = *(MULTABLE+O.Y*2)
+00633  0A76  0A                    ASL
+00634  0A77  AA                    TAX                      ; X = O.Y*2
+00635  0A78  BD 0C 0C              LDA            MULTABLE,X
+00636  0A7B  85 18                 STA            CURSCRNPTR
+00637  0A7D  BD 0D 0C              LDA            MULTABLE+1,X
+00638  0A80  85 19                 STA            CURSCRNPTR+1
+00639  0A82             ; -----------------
+00640  0A82             PAINTTOP
+00641  0A82             
+00642  0A82             
+00643  0A82  A4 FB                 LDY            @VHX
+00644  0A84  30 04                 BMI            @NOHEAD
+00645  0A86  A9 55                 LDA            #O0_FU
+00646  0A88  91 18                 STA            (CURSCRNPTR),Y
+00647  0A8A             @NOHEAD
+00648  0A8A  A4 FA                 LDY            @VTX
+00649  0A8C  30 0A                 BMI            @NOTAIL
+00650  0A8E  A6 F9                 LDX            @VTC
+00651  0A90  A9 43                 LDA            #O0_MU
+00652  0A92             @MORETAIL
+00653  0A92  91 18                 STA            (CURSCRNPTR),Y
+00654  0A94  C8                    INY
+00655  0A95  CA                    DEX
+00656  0A96  D0 FA                 BNE            @MORETAIL
+00657  0A98             @NOTAIL
+00658  0A98             NEXTROW
+00659  0A98                        ; NEXT ROW JUST ADD 40 TO CURSCRNPTR
+00660  0A98  18                    CLC                      ; 2 NEED THIS AS USING INC LATER MIGHT LEAVE CARRY ON
+00661  0A99  A5 18                 LDA            CURSCRNPTR; 3 CURSCRNPTR += 40
+00662  0A9B  69 28                 ADC            #40       ; 2
+00663  0A9D  85 18                 STA            CURSCRNPTR; 3
+00664  0A9F  90 02                 BCC            @NOCARRY  ; 2 NOT TAKEN (1 OUT OF 4), 3 TAKEN (3 OUT OF 4)
+00665  0AA1  E6 19                 INC            CURSCRNPTR+1; 5 1/4 WE KNOW WE HAVE CARRY
+00666  0AA3             @NOCARRY
+00667  0AA3  18                    CLC
+00668  0AA4                        ; CHECK IF WE NEED TO PAINT THE MIDDLE
+00669  0AA4  C6 FE                 DEC            @VH
+00670  0AA6  30 31                 BMI            PAINTEND  ; SUPPORT FOR 1 ROW OBSTACLES
+00671  0AA8  F0 19                 BEQ            PAINTBOTTOM
+00672  0AAA             @PAINTMIDDLE 
+00673  0AAA             
+00674  0AAA             
+00675  0AAA  A4 FB                 LDY            @VHX
+00676  0AAC  30 04                 BMI            @NOHEAD
+00677  0AAE  A9 42                 LDA            #O0_FM
+00678  0AB0  91 18                 STA            (CURSCRNPTR),Y
+00679  0AB2             @NOHEAD
+00680  0AB2  A4 FA                 LDY            @VTX
+00681  0AB4  30 0A                 BMI            @NOTAIL
+00682  0AB6  A6 F9                 LDX            @VTC
+00683  0AB8  A9 66                 LDA            #O0_MM
+00684  0ABA             @MORETAIL
+00685  0ABA  91 18                 STA            (CURSCRNPTR),Y
+00686  0ABC  C8                    INY
+00687  0ABD  CA                    DEX
+00688  0ABE  D0 FA                 BNE            @MORETAIL
+00689  0AC0             @NOTAIL
+00690  0AC0  4C 98 0A              JMP            NEXTROW
+00691  0AC3             PAINTBOTTOM 
+00692  0AC3             
+00693  0AC3             
+00694  0AC3  A4 FB                 LDY            @VHX
+00695  0AC5  30 04                 BMI            @NOHEAD
+00696  0AC7  A9 4A                 LDA            #O0_FB
+00697  0AC9  91 18                 STA            (CURSCRNPTR),Y
+00698  0ACB             @NOHEAD
+00699  0ACB  A4 FA                 LDY            @VTX
+00700  0ACD  30 0A                 BMI            @NOTAIL
+00701  0ACF  A6 F9                 LDX            @VTC
+00702  0AD1  A9 43                 LDA            #O0_MB
+00703  0AD3             @MORETAIL
+00704  0AD3  91 18                 STA            (CURSCRNPTR),Y
+00705  0AD5  C8                    INY
+00706  0AD6  CA                    DEX
+00707  0AD7  D0 FA                 BNE            @MORETAIL
+00708  0AD9             @NOTAIL
+00709  0AD9             PAINTEND
+00710  0AD9  A9 06                 LDA            #VIC_BLUE
+00711  0ADB  8D 20 D0              STA            VIC_BORDERC
+00712  0ADE             ; *******************************
+00713  0ADE             ; ** CALC RIGHT SIDE
+00714  0ADE             ; *******************************
+00715  0ADE  A6 FF                 LDX            @CUROBJ
+00716  0AE0                        ; SET VH COUNTER
+00717  0AE0  BC 01 C0              LDY            OB_H+OBJTABLE,X
+00718  0AE3  88                    DEY
+00719  0AE4  84 FE                 STY            @VH
+00720  0AE6  BD 04 C0              LDA            OB_X1+OBJTABLE,X; LEFT END OF OBJECT
+00721  0AE9  18                    CLC
+00722  0AEA  6D 02 C0              ADC            OB_L+OBJTABLE; ADD LENGTH OF THE OBJECT
+00723  0AED  9D 05 C0              STA            OB_X2+OBJTABLE,X; STORE RIGHT END OF OBJECT
+00724  0AF0  C9 FC                 CMP            #-4
+00725  0AF2  10 03                 BPL            PAINTTHISRIGHT
+00726  0AF4  4C AE 0B              JMP            PAINTENDRIGHT
+00727  0AF7             PAINTTHISRIGHT 
+00728  0AF7                        ; REPEAT HEAD AND TAIL PAINT LOCATION CALCULATION WE DID
+00729  0AF7                        ; FOR THE LEFT END OF OBJECT
+00730  0AF7                        ; @VHX X WHERE THE HEAD GOES, NEGATIVE IF NO HEAD
+00731  0AF7                        ; @VTX X WHERE THE TAIL GOES, NEGATIVE IF NO TAIL
+00732  0AF7                        ; @VTC COUNT OF HOW MANY TAILS TO PAINT
+00733  0AF7  C9 00                 CMP            #0
+00734  0AF9  30 09                 BMI            @NOHEAD   ; LESS THAN 0, NO HEAD PAINTED
+00735  0AFB  C9 28                 CMP            #40
+00736  0AFD  10 05                 BPL            @NOHEAD   ; 40 OR MORE, NO HEAD (NO TAIL EITHER)
+00737  0AFF  85 FB                 STA            @VHX      ; HEAD IS AT X1
+00738  0B01  4C 08 0B              JMP            @CHECKTAIL
+00739  0B04             @NOHEAD
+00740  0B04  A9 FF                 LDA            #-1
+00741  0B06  85 FB                 STA            @VHX
+00742  0B08             @CHECKTAIL 
+00743  0B08  BD 05 C0              LDA            OB_X2+OBJTABLE,X; THIS+1 TO THIS+DELTA IS TAIL
+00744  0B0B  C9 FF                 CMP            #-1
+00745  0B0D  30 1E                 BMI            @TAILLEFT
+00746  0B0F             ; X0 >= -1
+00747  0B0F  C9 27                 CMP            #39
+00748  0B11  10 2A                 BPL            @NOTAIL
+00749  0B13  18                    CLC
+00750  0B14  69 01                 ADC            #1
+00751  0B16  85 FA                 STA            @VTX      ; TAIL IS AT X1+1
+00752  0B18  A9 28                 LDA            #40
+00753  0B1A  38                    SEC
+00754  0B1B  E5 FA                 SBC            @VTX
+00755  0B1D  C5 21                 CMP            DELTA
+00756  0B1F  10 05                 BPL            @BIGGERDELTA
+00757  0B21  85 F9                 STA            @VTC
+00758  0B23  4C 41 0B              JMP            @TAILDONE
+00759  0B26             @BIGGERDELTA 
+00760  0B26  A5 21                 LDA            DELTA
+00761  0B28  85 F9                 STA            @VTC
+00762  0B2A  4C 41 0B              JMP            @TAILDONE
+00763  0B2D             ; X0 < -1
+00764  0B2D             @TAILLEFT
+00765  0B2D  18                    CLC
+00766  0B2E  65 21                 ADC            DELTA     ; X0+DELTA
+00767  0B30                        ; 0 OR ABOVE, MEANS WE PAINT
+00768  0B30  30 0B                 BMI            @NOTAIL
+00769  0B32  69 01                 ADC            #1
+00770  0B34  85 F9                 STA            @VTC      ; HOW MANY TRAILING CHARS TO PAINT
+00771  0B36  A9 00                 LDA            #0
+00772  0B38  85 FA                 STA            @VTX      ; ALL GET PAINTED AT ZERO
+00773  0B3A  4C 41 0B              JMP            @TAILDONE
+00774  0B3D             @NOTAIL
+00775  0B3D  A9 FF                 LDA            #-1
+00776  0B3F  85 FA                 STA            @VTX      ; NO TAIL PAINTS AT ALL
+00777  0B41             @TAILDONE
+00778  0B41             ; *******************************
+00779  0B41             ; ** PAINT RIGHT SIDE
+00780  0B41             ; *******************************
+00781  0B41             
+00782  0B41             
+00783  0B41  48                    PHA
+00784  0B42  A9 0D                 LDA            #VIC_LIGHTGREEN
+00785  0B44  8D 20 D0              STA            VIC_BORDERC
+00786  0B47  68                    PLA
+00787  0B48                        ; PREPARE SCRNPTR
+00788  0B48  BD 03 C0              LDA            OB_Y+OBJTABLE,X; CURSCRNPTR = *(MULTABLE+O.Y*2)
+00789  0B4B  0A                    ASL
+00790  0B4C  AA                    TAX                      ; X = O.Y*2
+00791  0B4D  BD 0C 0C              LDA            MULTABLE,X
+00792  0B50  85 18                 STA            CURSCRNPTR
+00793  0B52  BD 0D 0C              LDA            MULTABLE+1,X
+00794  0B55  85 19                 STA            CURSCRNPTR+1
+00795  0B57             PAINTTOPRIGHT 
+00796  0B57             
+00797  0B57             
+00798  0B57  A4 FB                 LDY            @VHX
+00799  0B59  30 04                 BMI            @NOHEAD
+00800  0B5B  A9 49                 LDA            #O0_BU
+00801  0B5D  91 18                 STA            (CURSCRNPTR),Y
+00802  0B5F             @NOHEAD
+00803  0B5F  A4 FA                 LDY            @VTX
+00804  0B61  30 0A                 BMI            @NOTAIL
+00805  0B63  A6 F9                 LDX            @VTC
+00806  0B65  A9 24                 LDA            #STARCHAR
+00807  0B67             @MORETAIL
+00808  0B67  91 18                 STA            (CURSCRNPTR),Y
+00809  0B69  C8                    INY
+00810  0B6A  CA                    DEX
+00811  0B6B  D0 FA                 BNE            @MORETAIL
+00812  0B6D             @NOTAIL
+00813  0B6D             NEXTROWRIGHT 
+00814  0B6D                        ; NEXT ROW JUST ADD 40 TO CURSCRNPTR
+00815  0B6D  18                    CLC
+00816  0B6E  A5 18                 LDA            CURSCRNPTR; CURSCRNPTR += 40
+00817  0B70  69 28                 ADC            #40
+00818  0B72  85 18                 STA            CURSCRNPTR
+00819  0B74  90 02                 BCC            @NOCARRY
+00820  0B76  E6 19                 INC            CURSCRNPTR+1
+00821  0B78             @NOCARRY
+00822  0B78  18                    CLC
+00823  0B79                        ; CHECK IF WE NEED TO PAINT THE MIDDLE
+00824  0B79  C6 FE                 DEC            @VH
+00825  0B7B  30 31                 BMI            PAINTENDRIGHT; SUPPORT FOR 1 ROW OBSTACLES
+00826  0B7D  F0 19                 BEQ            PAINTBOTTOMRIGHT
+00827  0B7F             @PAINTMIDDLE 
+00828  0B7F             
+00829  0B7F             
+00830  0B7F  A4 FB                 LDY            @VHX
+00831  0B81  30 04                 BMI            @NOHEAD
+00832  0B83  A9 48                 LDA            #O0_BM
+00833  0B85  91 18                 STA            (CURSCRNPTR),Y
+00834  0B87             @NOHEAD
+00835  0B87  A4 FA                 LDY            @VTX
+00836  0B89  30 0A                 BMI            @NOTAIL
+00837  0B8B  A6 F9                 LDX            @VTC
+00838  0B8D  A9 24                 LDA            #STARCHAR
+00839  0B8F             @MORETAIL
+00840  0B8F  91 18                 STA            (CURSCRNPTR),Y
+00841  0B91  C8                    INY
+00842  0B92  CA                    DEX
+00843  0B93  D0 FA                 BNE            @MORETAIL
+00844  0B95             @NOTAIL
+00845  0B95  4C 6D 0B              JMP            NEXTROWRIGHT
+00846  0B98             PAINTBOTTOMRIGHT 
+00847  0B98             
+00848  0B98             
+00849  0B98  A4 FB                 LDY            @VHX
+00850  0B9A  30 04                 BMI            @NOHEAD
+00851  0B9C  A9 4B                 LDA            #O0_BB
+00852  0B9E  91 18                 STA            (CURSCRNPTR),Y
+00853  0BA0             @NOHEAD
+00854  0BA0  A4 FA                 LDY            @VTX
+00855  0BA2  30 0A                 BMI            @NOTAIL
+00856  0BA4  A6 F9                 LDX            @VTC
+00857  0BA6  A9 24                 LDA            #STARCHAR
+00858  0BA8             @MORETAIL
+00859  0BA8  91 18                 STA            (CURSCRNPTR),Y
+00860  0BAA  C8                    INY
+00861  0BAB  CA                    DEX
+00862  0BAC  D0 FA                 BNE            @MORETAIL
+00863  0BAE             @NOTAIL
+00864  0BAE             PAINTENDRIGHT 
+00865  0BAE             ENDOBJ
+00866  0BAE  A6 FF                 LDX            @CUROBJ   ; RESTORE CUR OBJ POINTER IN X
+00867  0BB0                        ; GO THE NEXT OBJECT, PUT THE CURRENT OBJECT IN X AGAIN
+00868  0BB0                        
+00869  0BB0  60                    RTS
+00870  0BB1                        
+00871  0BB1             ;*********************************
+00872  0BB1             ;** ACTIVATES OBJECTS
+00873  0BB1             ;*********************************
+00874  0BB1             
+00875  0BB1             ; VARIABLES
+00876  0BB1             
+00877  0BB1             
+00878  0BB1             ; LEVEL STRUCT DEFINITION
+00879  0BB1             LVL_TYPE   = 0
+00880  0BB1             LVL_HEIGHT= 1
+00881  0BB1             LVL_WIDTH  = 2
+00882  0BB1             LVL_Y      = 3
+00883  0BB1             LVL_POS    = 4
+00884  0BB1             
+00885  0BB1             ACTIVATEOBJECTS 
+00886  0BB1                        ; INCREMENT STAGEX BY ONE
+00887  0BB1  18                    CLC
+00888  0BB2  A5 22                 LDA            STAGEX_W
+00889  0BB4  69 01                 ADC            #1
+00890  0BB6  85 22                 STA            STAGEX_W
+00891  0BB8  A5 23                 LDA            STAGEX_W+1
+00892  0BBA  69 00                 ADC            #0
+00893  0BBC  85 23                 STA            STAGEX_W+1
+00894  0BBE             
+00895  0BBE             
+00896  0BBE  A0 05                 LDY            #LVL_XPOS+1
+00897  0BC0                        ; COMPARE OUR STAGEX TO THE LOCATION THE NEXT OBJECT SHOULD APPEAR
+00898  0BC0                        
+00899  0BC0                        
+00900  0BC0  B1 24                 LDA            (LEVELPTR_W),Y
+00901  0BC2  C5 23                 CMP            STAGEX_W+1; HIGH BYTE
+00902  0BC4                        
+00903  0BC4  30 0A                 BMI            @ACTIVATE
+00904  0BC6  88                    DEY
+00905  0BC7  B1 24                 LDA            (LEVELPTR_W),Y
+00906  0BC9  C5 22                 CMP            STAGEX_W
+00907  0BCB  30 03                 BMI            @ACTIVATE
+00908  0BCD  4C 0B 0C              JMP            @NOOP
+00909  0BD0                        
+00910  0BD0             ;*********************************
+00911  0BD0             ;* ACTIVATE OBJECT AT LEVELPTR_W
+00912  0BD0             ;*********************************
+00913  0BD0             @ACTIVATE
+00914  0BD0                        
+00915  0BD0                        ; FIND THE FIRST OBJECT THAT IS NOT IN USE
+00916  0BD0  A0 0A                 LDY            #MAX_OBJECTS
+00917  0BD2  A2 00                 LDX            #0
+00918  0BD4             @FINDNEXT
+00919  0BD4  BD 00 C0              LDA            OBJTABLE,X
+00920  0BD7  F0 0C                 BEQ            @FOUND
+00921  0BD9                        
+00922  0BD9  8A                    TXA                      ; X+=OBJ_SIZE
+00923  0BDA  18                    CLC
+00924  0BDB  69 06                 ADC            #OB_SIZE
+00925  0BDD  AA                    TAX
+00926  0BDE                        
+00927  0BDE                        ; TEST IF END OF LIST
+00928  0BDE  C9 3C                 CMP            #OB_SIZE*MAX_OBJECTS
+00929  0BE0  30 F2                 BMI            @FINDNEXT
+00930  0BE2  4C 0B 0C              JMP            @NOOP
+00931  0BE5                        
+00932  0BE5             @FOUND     ; OBJTABLE, X IS AN AVAILABLE OBJECT
+00933  0BE5             
+00934  0BE5                        ; ACTIVATE OBJECT AT LEVELPTR_W INTO OBJTABLE
+00935  0BE5  A0 00                 LDY            #0
+00936  0BE7  B1 24                 LDA            (LEVELPTR_W),Y
+00937  0BE9  9D 00 C0              STA            OBJTABLE+OB_TYPE,X
+00938  0BEC                        
+00939  0BEC  C8                    INY
+00940  0BED  B1 24                 LDA            (LEVELPTR_W),Y
+00941  0BEF  9D 01 C0              STA            OBJTABLE+OB_H,X
+00942  0BF2                        
+00943  0BF2  C8                    INY
+00944  0BF3  B1 24                 LDA            (LEVELPTR_W),Y
+00945  0BF5  9D 02 C0              STA            OBJTABLE+OB_L,X
+00946  0BF8                        
+00947  0BF8  C8                    INY
+00948  0BF9  B1 24                 LDA            (LEVELPTR_W),Y
+00949  0BFB  9D 03 C0              STA            OBJTABLE+OB_Y,X
+00950  0BFE                        ; X1 = LVL_XPOS - STAGEX_W + 50 (40 WIDTH + 10 MARGIN)
+00951  0BFE                        
+00952  0BFE                        
+00953  0BFE  C8                    INY
+00954  0BFF  C8                    INY
+00955  0C00  B1 24                 LDA            (LEVELPTR_W),Y; LVL_XPOS
+00956  0C02  38                    SEC
+00957  0C03  E5 23                 SBC            STAGEX_W+1
+00958  0C05  18                    CLC
+00959  0C06  69 32                 ADC            #50
+00960  0C08  9D 04 C0              STA            OBJTABLE+OB_X1,X
+00961  0C0B                        
+00962  0C0B             @NOOP
+00963  0C0B  60                    RTS
+00964  0C0C                        
+00965  0C0C                        
+00966  0C0C             
+00967  0C0C             MULTABLE
+00968  0C0C  00 00 00              DCW            25,0
+00969  0C3E             ;*****************************
+00970  0C3E             ; OBSTACLES ON SCREEN
+00971  0C3E             ; OBJECTS ARE OB_SIZE BYTES
+00972  0C3E             ;*****************************
+00973  0C3E                        
+00974  0C3E             LVL_XPOS   = 4
+00975  0C3E             LVL_SIZE   = 6
+00976  0C3E                        
+00977  0C3E             LEVEL
+00978  0C3E  01 04 1E              BYTE           1,4,30, 3 ; TYPE, HEIGHT, WIDTH, Y
+00979  0C42  0A 00                 WORD           10        ; POSITION WITHIN BLOCK
+00980  0C44  01 04 1E              BYTE           1,4,30, 15
+00981  0C48  1E 00                 WORD           30
+00982  0C4A  01 04 1E              BYTE           1,4,30, 20
+00983  0C4E  3C 00                 WORD           60
+00984  0C50  01 04 1E              BYTE           1,4,30, 20
+00985  0C54  78 00                 WORD           120
+00986  0C56             
+00987  0C56             
+00988  0C56             ; **********************************
+00989  0C56             ; * OBJECT TABLE
+00990  0C56             ; **********************************
+00991  0C56             OBJTABLE   = $C000
+00992  0C56             
+00993  0C56             MAX_OBJECTS = 10
+00994  0C56                        
+00995  0C56             OB_TYPE    = 0
+00996  0C56             OB_H       = 1
+00997  0C56             OB_L       = 2
+00998  0C56             OB_Y       = 3
+00999  0C56             OB_X1      = 4
+01000  0C56             OB_X2      = 5
+01001  0C56             OB_SIZE    = 6
+01002  0C56                        
+01003  0C56                        
+01004  0C56             
 
-******* 42 Label(s) *******
-~~~moretail{00004} = $09EE 
-~~~moretail{00005} = $0A16 
-~~~moretail{00006} = $0A2F 
-~~~moretail{00008} = $0AC3 
-~~~moretail{00009} = $0AEB 
-~~~moretail{00010} = $0B04 
-~~~nohead{00004} = $09E6 
-~~~nohead{00005} = $0A0E 
-~~~nohead{00006} = $0A27 
-~~~nohead{00008} = $0ABB 
-~~~nohead{00009} = $0AE3 
-~~~nohead{00010} = $0AFC 
-~~~notail{00004} = $09F4 
-~~~notail{00005} = $0A1C 
-~~~notail{00006} = $0A35 
-~~~notail{00008} = $0AC9 
-~~~notail{00009} = $0AF1 
-~~~notail{00010} = $0B0A 
-activateobjects = $0946 
-endobj = $0B0A 
-forever = $08F7 
-initlevel = $0B80 
-initmultable = $0B2D 
-level = $0C8D 
-multable = $0B93 
-nextrow = $09F4 
-nextrowright = $0AC9 
-objectgen = $0953 
-objtable = $0BC5 
-paintbottom = $0A1F 
-paintbottomright = $0AF4 
-paintend = $0A35 
-paintendright = $0B0A 
-paintobjects = $0953 
-paintthis = $0980 
-paintThisRight = $0A53 
-painttop = $09DE 
-painttopright = $0AB3 
-printa = $0B59 
+******* 41 Label(s) *******
+~~~moretail{00006} = $0A92 
+~~~moretail{00007} = $0ABA 
+~~~moretail{00008} = $0AD3 
+~~~moretail{00010} = $0B67 
+~~~moretail{00011} = $0B8F 
+~~~moretail{00012} = $0BA8 
+~~~nohead{00006} = $0A8A 
+~~~nohead{00007} = $0AB2 
+~~~nohead{00008} = $0ACB 
+~~~nohead{00010} = $0B5F 
+~~~nohead{00011} = $0B87 
+~~~nohead{00012} = $0BA0 
+~~~notail{00006} = $0A98 
+~~~notail{00007} = $0AC0 
+~~~notail{00008} = $0AD9 
+~~~notail{00010} = $0B6D 
+~~~notail{00011} = $0B95 
+~~~notail{00012} = $0BAE 
+activateObjects = $0BB1 
+endobj = $0BAE 
+forever = $08FA 
+initlevel = $0959 
+initmultable = $09A4 
+level = $0C3E 
+multable = $0C0C 
+nextrow = $0A98 
+nextrowright = $0B6D 
+objectgen = $09F7 
+paintbottom = $0AC3 
+paintbottomright = $0B98 
+paintend = $0AD9 
+paintendright = $0BAE 
+paintObjects = $09F7 
+paintthis = $0A24 
+paintThisRight = $0AF7 
+painttop = $0A82 
+painttopright = $0B57 
+printa = $09D0 
 start = $0830 
-triband = $0B16 
-WAIT = $08F9 
+triband = $098D 
+WAIT = $08FC 
 
-******* 26 Unused label(s) *******
+******* 23 Unused label(s) *******
+@activate
+@again
 @biggerdelta
 @biggerdelta
 @checktail
 @checktail
+@clearnext
 @done
 @dothisobject
+@findNext
+@found
 @loop
 @next
 @nextcolor
@@ -901,6 +1066,7 @@ WAIT = $08F9
 @nohead
 @nohead
 @nol
+@noop
 @nor
 @nos
 @notail
@@ -915,34 +1081,31 @@ WAIT = $08F9
 @taildone
 @tailleft
 @tailleft
-~~~moretail{00004}
-~~~moretail{00005}
 ~~~moretail{00006}
+~~~moretail{00007}
 ~~~moretail{00008}
-~~~moretail{00009}
 ~~~moretail{00010}
-~~~nohead{00004}
-~~~nohead{00005}
+~~~moretail{00011}
+~~~moretail{00012}
 ~~~nohead{00006}
+~~~nohead{00007}
 ~~~nohead{00008}
-~~~nohead{00009}
 ~~~nohead{00010}
-~~~notail{00004}
-~~~notail{00005}
+~~~nohead{00011}
+~~~nohead{00012}
 ~~~notail{00006}
+~~~notail{00007}
 ~~~notail{00008}
-~~~notail{00009}
 ~~~notail{00010}
-activateobjects
+~~~notail{00011}
+~~~notail{00012}
 objectgen
-objtable
-paintobjects
 painttop
 painttopright
 printa
 start
 
-******* 93 Variable(s) *******
+******* 101 Variable(s) *******
 @curobj  = $00FF
 @hflag  = $00FC
 @unused  = $00FD
@@ -957,10 +1120,17 @@ CIAB_PRA  = $DD00
 curcolor_w  = $0014
 curptr  = $0016
 curscrnptr  = $0018
-cursrcptr  = $00FE
 delta  = $0021
 framect  = $0013
 levelptr_w  = $0024
+lvl_height  = $0001
+lvl_pos  = $0004
+lvl_size  = $0006
+lvl_type  = $0000
+lvl_width  = $0002
+lvl_xpos  = $0004
+lvl_y  = $0003
+max_objects  = $000A
 o0_bb  = $004B
 o0_bm  = $0048
 o0_bu  = $0049
@@ -977,6 +1147,7 @@ ob_type  = $0000
 ob_x1  = $0004
 ob_x2  = $0005
 ob_y  = $0003
+objtable  = $C000
 screen  = $8400
 scrptr_w  = $0010
 stagex_w  = $0022
@@ -1040,14 +1211,20 @@ VIC_YELLOW  = $0007
 @hflag
 @unused
 chars
-cursrcptr
+lvl_height
+lvl_pos
+lvl_size
+lvl_type
+lvl_width
+lvl_xpos
+lvl_y
 ob_h
 ob_l
-ob_size
 ob_type
 ob_x1
 ob_x2
 ob_y
+objtable
 star_chars0
 star_chars1
 tgt_c64

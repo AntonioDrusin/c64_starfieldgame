@@ -5,7 +5,7 @@ DebugStartAddress start
 ; Include macros and definitions
 Incasm    "vicii.asm""
 Incasm    "macros.asm"
-Incasm    "level.asm"
+
        
 
 ; BASIC header   
@@ -25,11 +25,22 @@ charsetend = $bfff
 starchar  = 36
 star_chars0 = chars+288
 star_chars1 = chars+296
-          
+
+; $0-$ff zero page
+; $100-$1ff stack
+; $200-$7fff RAM
+; $8000-$bfff VIC
+; $c000-$ffff RAM          
+
 ; *********************
-; ZERO PAGE VARIABLES
+; Constants
 ; *********************
-; VARIABLES
+
+                    
+
+; ***************************
+; Zero Page Global Variables
+; ***************************
 scrptr_w  = $10                    ; For character filling
 atemp     = $12                    ; Store A sometimes
 framect   = $13
@@ -41,17 +52,14 @@ delta     = $21                    ; delta characters for screen scroll
 stagex_w  = $22                    ; current position of the stage
 levelptr_w= $24                    ; pointer to the currently evaluated object in the level          
                     
-; temp variables for programs:
-ob_type   = 0
-ob_h      = 1
-ob_l      = 2
-ob_y      = 3
-ob_x1     = 4
-ob_x2     = 5
-ob_size   = 6
-          
 start
-          jsr            initlevel
+          jsr            initlevel 
+          
+@again
+          ;jsr            activateObjects
+         ; jmp            @again    
+          
+          
                                    ; disable CIA interrupt (Is this on by default for BASIC?)
                                    ; This is important or the copy char routine will crash for some reason
           lda            $dc0e
@@ -82,6 +90,7 @@ start
           sta            88
           sty            89
           jsr            $a3bf     ; block copy
+          
           lda            $1
           and            #$f8
           ora            #$05      ; All RAM, except for i/o
@@ -97,7 +106,7 @@ start
           ora            #$0c
           sta            VIC_MEM   ; $1c
 ; ******************************************
-; Fill screen with alternating BC characters
+; Fill background with alternating BC characters
 ; ******************************************
           movew          screen,scrptr_w
           ldx            #25       ; 25 lines
@@ -115,9 +124,9 @@ start
           lda            atemp
           dex
           bne            @rowloop
-; ************
-; Setup Colors
-; ************
+; ***********************
+; Setup Character Colors
+; ***********************
           lda            #$0
           sta            $d020     ; border
           sta            $d021     ; background
@@ -212,8 +221,8 @@ WAIT
 ;*********************************
 
           perfMark       VIC_LIGHTRED
-          activateObjects
           
+          jsr activateObjects          
           jsr paintObjects
 
 
@@ -237,6 +246,21 @@ initlevel
           lda            #>level   
           sta            levelptr_w+1
           
+; clear object memory
+          ldy            #max_objects-1
+          ldx            #0        
+          lda            #0        
+@clearnext          
+          sta            objtable,x
+          inx
+          inx
+          inx
+          inx
+          inx
+          inx
+          dey
+          bpl            @clearnext
+          
           rts
           
 ; *******************************
@@ -245,7 +269,7 @@ initlevel
 
 Incasm    "utility.asm"
 Incasm    "paintObjects.asm"
-
+Incasm    "level.asm"
 
 multable
           DCW            25,0
@@ -253,13 +277,12 @@ multable
 ; Obstacles on screen
 ; Objects are ob_size bytes
 ;*****************************
-objtable
-                                   ; Type, height, width, y,, x1, x2
-          DCB            200,0; space for enough objects
-          
-          
+ 
+lvl_xpos  = 4
+lvl_size  = 6
+                             
 level
-          BYTE           1,4,30, 3 ; Type, height, width, y
+          BYTE           1,6,50, 2 ; Type, height, width, y
           WORD           10        ; position within block
           BYTE           1,4,30, 15
           WORD           30
@@ -267,3 +290,21 @@ level
           WORD           60
           BYTE           1,4,30, 20
           WORD           120
+
+
+; **********************************
+; * Object table
+; **********************************
+objtable = $c000          
+
+max_objects = 10
+          
+ob_type   = 0
+ob_h      = 1
+ob_l      = 2
+ob_y      = 3
+ob_x1     = 4
+ob_x2     = 5
+ob_size   = 6          
+       
+          
